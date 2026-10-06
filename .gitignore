@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+data/
+_test_runtime/
+work/
+*.bak
+*.log
+.env
+.env.*
+!.env.example
