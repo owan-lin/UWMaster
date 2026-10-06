@@ -1724,7 +1724,7 @@
     {
       "id": "ed-106640-preclass-184333",
       "course_id": "cse123",
-      "title": "Pre-class Material 1 · 完成 Testing、Comparable 与继承/多态阅读练习",
+      "title": "Pre-class Material 1",
       "kind": "preparation",
       "due": "2026-10-02T11:30:00-07:00",
       "certainty": "verified",
@@ -1741,7 +1741,7 @@
     {
       "id": "ed-106640-preclass-184530",
       "course_id": "cse123",
-      "title": "Pre-class Material 2 · 阅读编译/运行时与抽象类，完成概念题和 Birds! 练习",
+      "title": "Pre-class Material 2",
       "kind": "preparation",
       "due": "2026-10-07T11:30:00-07:00",
       "certainty": "verified",
