@@ -11,3 +11,5 @@
 - 字体参考：https://www.washington.edu/brand/brand-elements/fonts/
 
 获取日期：2026-10-06。个人课程面板，非 UW 官方应用。
+
+- `noto-sc-400.ttf` / `noto-sc-600.ttf`：Noto Sans SC，400 / 600；本轮从此前保留的本地字体备份恢复，仅用于 Hero 以下的中文工作区。原始来源：https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600&display=swap 。

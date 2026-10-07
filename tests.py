@@ -19,7 +19,7 @@ try:
  h.shutdown();h.server_close();h=start();port=h.server_port
  assert request('GET','/api/data')[1]['tasks'][0]['user_completed'] is True
  # Brand assets are public; snapshots, notes and arbitrary files remain private.
- for asset in ('uw-logo.svg','uw-campus.jpg','fonts.css','font-1.ttf','font-2.ttf','font-3.ttf','font-4.ttf'):
+ for asset in ('uw-logo.svg','uw-campus.jpg','fonts.css','font-1.ttf','font-2.ttf','font-3.ttf','font-4.ttf','noto-sc-400.ttf','noto-sc-600.ttf'):
   con=http.client.HTTPConnection('127.0.0.1',port);con.request('GET','/assets/'+asset)
   response=con.getresponse();assert response.status==200,asset;assert response.read();con.close()
  for path in ('/snapshot.json','/data/user_state.json','/assets/SOURCES.md','/assets/../snapshot.json'):

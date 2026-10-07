@@ -95,3 +95,121 @@ h1{font-size:40px;line-height:1.1;margin:0;letter-spacing:-1.3px}
   .calendar-toolbar>#switch{grid-column:2;grid-row:1}
   .week .event strong{font-size:11px}
 }
+
+/* Hero-below academic workspace. All tokens and rules are scoped to this plane. */
+body:has(.quarter-intro){background:#f4f3f0}
+#app{--canvas:#f4f3f0;--surface:#fff;--text:#29252d;--secondary:#6e6873;--quiet:#918c94;--hairline:#e3e0e5;--soft:#f3f0f7;--ui:"Open Sans","Noto Sans SC","PingFang SC",sans-serif;--heading:"Encode Sans","Noto Sans SC","PingFang SC",sans-serif;background:var(--surface);color:var(--text);font-family:var(--ui);margin:32px auto 40px;padding:36px 42px 42px;grid-template-columns:218px minmax(0,1fr);gap:36px 28px}
+#app h2,#app h3{font-family:var(--heading);font-weight:600}
+#app .section-caption{display:block;font:600 10px/1.5 var(--ui);letter-spacing:.09em;color:var(--secondary);margin:0 0 10px;text-transform:uppercase}
+#app .quarter-intro{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:24px;border-bottom:2px solid var(--p);padding-bottom:26px}
+#app .hero{grid-column:1/-1;order:0;min-height:0;padding:0;margin:0 0 26px;align-items:center;gap:32px}
+#app .hero h2{font-size:32px;line-height:1.35;letter-spacing:0;margin:0 0 12px}
+#app .hero .section-caption{color:var(--p)}
+#app .hero p{font-size:10.5px;letter-spacing:.04em;line-height:1.8;color:var(--secondary)}
+#app .next-check{display:block;color:var(--quiet);font-size:10px;margin-top:3px}
+#app .quarter-stats{display:flex;align-items:start;gap:38px;flex:none;padding-right:6px}
+#app .quarter-stats>div{display:flex;flex-direction:column;gap:7px;min-width:62px}
+#app .quarter-stats strong{font:700 36px/1 var(--display);letter-spacing:-1px;color:var(--p)}
+#app .quarter-stats span{font-size:9px;letter-spacing:.1em;color:var(--secondary)}
+#app .notice{background:transparent;color:var(--secondary);border-left:2px solid var(--g);padding:5px 12px;font-size:11px}
+#app .warning-summary{grid-column:1/-1;margin:0 0 14px}
+#app .warning-summary>.notice{margin-top:10px}
+#app .filters{padding:0;gap:12px;align-items:center}
+#app .filters input,#app .filters select{min-height:38px;height:38px;padding:7px 10px;border:1px solid var(--hairline);font-size:12px;border-radius:2px;background:#fff;color:var(--text)}
+#app .filters select{min-width:130px}
+#app .search-field{max-width:400px}
+#app .filters input{padding-left:32px}
+#app .search-field:before{content:"";top:12px;left:12px;width:10px;height:10px;border:1.5px solid var(--secondary);border-radius:50%}
+#app .search-field:after{content:"";position:absolute;width:5px;height:1.5px;background:var(--secondary);left:21px;top:23px;transform:rotate(45deg);pointer-events:none}
+#app .course-legend{margin:0;gap:16px;font-size:10px;align-self:center}
+#app .course-legend>span{color:var(--secondary);font-family:var(--display);font-weight:600}
+#app .course-legend i{width:15px;height:2px;border-radius:0}
+#app .sidebar{background:transparent;border:0;border-right:1px solid var(--hairline);padding:0 24px 0 0}
+#app .sidebar h2{font-size:20px;line-height:1.4;letter-spacing:0;margin:0 0 24px}
+#app .sidebar h2 small{font-size:10px;line-height:1.5;margin:0 0 10px}
+#app .sidebar button{background:transparent;border:0;border-left:3px solid transparent;border-radius:0;margin:0;padding:12px 12px;min-height:38px;color:var(--text)}
+#app .sidebar>button.active,#app .sidebar .course-group>button.active{border-left-color:var(--p);background:var(--soft);color:var(--p)}
+#app .sidebar .course-group{padding-top:14px;margin-top:14px;border-top:1px solid var(--hairline)}
+#app .sidebar .course-group>button{border-left-color:var(--course-accent);color:var(--text)}
+#app .sidebar b{font-family:var(--display);font-size:14px;font-weight:700}
+#app .sidebar small{font-size:11px;font-weight:400;color:var(--secondary);line-height:1.7;margin-top:5px}
+#app .sidebar details{font-size:10px;line-height:1.8;padding:8px 0 0 15px;margin:0;border:0;color:var(--secondary)}
+#app .sidebar summary{font-size:10px;color:var(--quiet)}
+#app .workspace{display:block}
+#app .two-panels{grid-template-columns:minmax(310px,4fr) minmax(0,6fr);gap:0;align-items:start}
+#app .todo-panel,#app .calendar-panel{border:0;background:transparent;padding:0;border-radius:0;min-width:0}
+#app .todo-panel{padding-right:28px;max-height:78vh;scrollbar-width:thin}
+#app .calendar-panel{padding-left:28px;border-left:1px solid var(--hairline)}
+#app .panel-heading{position:static;min-height:68px;padding:0;margin:0 0 24px;align-items:flex-start;background:transparent}
+#app .panel-heading h3{font-size:21px;line-height:1.4;letter-spacing:0;font-weight:600}
+#app .panel-heading>span{background:transparent;padding:25px 0 0;font-size:10px;line-height:1.6;color:var(--quiet)}
+#app .task{position:relative;grid-template-columns:16px minmax(0,1fr) 66px;gap:12px;background:transparent;border:0;border-bottom:1px solid var(--hairline);margin:0;padding:22px 0 22px 13px;min-height:105px}
+#app .task:before{content:"";position:absolute;left:0;top:24px;bottom:24px;width:3px;background:var(--task-accent)}
+#app .task:hover{background:#faf9fc}
+#app .task input{width:14px;height:14px;margin-top:4px;accent-color:var(--p)}
+#app .task .task-title{font-family:var(--ui);color:var(--text);line-height:1.5}
+#app .task b{font-family:var(--ui);font-size:14px;font-weight:600;line-height:1.5}
+#app .task .task-title:hover b{color:var(--p)}
+#app .task small{font-size:10.5px;line-height:1.7;margin-top:7px;gap:3px 6px;color:var(--secondary)}
+#app .task .course-code{font-size:10.5px;color:var(--secondary);font-weight:600}
+#app .task .kind-label,#app .task .grade-label{background:transparent;border:0;padding:0;font-size:10.5px;font-weight:400;color:var(--secondary)}
+#app .task .kind-label:before,#app .task .grade-label:before{content:'·';margin-right:6px;color:var(--quiet)}
+#app .task i{background:transparent;border:1px solid var(--hairline);border-radius:0;font-size:9px;padding:0 4px;color:var(--secondary)}
+#app .task i.uncertain{border-color:var(--g);color:var(--heritage)}
+#app .task .task-detail{font-size:10.5px;line-height:1.5;min-height:26px;margin-top:5px;color:var(--secondary);text-decoration:none}
+#app .task .task-detail:hover{color:var(--p);text-decoration:underline}
+#app .task time{font-size:10px;color:var(--secondary);letter-spacing:.02em;align-self:start;padding-top:1px;line-height:1.8}
+#app .task time strong{font-family:var(--ui);font-weight:600;font-size:14px;color:var(--text)}
+#app .task time small{font-size:9px;margin-top:3px;color:var(--heritage)}
+#app .task time.date-uncertain strong{color:var(--heritage)}
+#app .task.done .task-title b{color:var(--quiet)}
+#app .calendar-toolbar{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;margin:0 0 20px;min-height:34px}
+#app .calendar-toolbar>span{display:flex;gap:3px}
+#app .calendar-toolbar button{background:transparent;border:0;padding:4px 7px;min-height:32px;font-size:12px;line-height:1.7;color:var(--secondary);border-radius:0}
+#app .calendar-toolbar button:hover{color:var(--p);background:var(--soft)}
+#app .calendar-toolbar>span>button:not(#today){font-size:20px;line-height:1;width:26px;padding:0}
+#app .calendar-toolbar>b{font-family:var(--display);font-weight:600;font-size:12px;color:var(--text);grid-column:auto;grid-row:auto}
+#app .calendar-toolbar .view-tabs{justify-self:end;gap:10px}
+#app .view-tabs button{border-bottom:2px solid transparent;padding:4px 5px;min-width:24px;font-size:12px!important;width:auto!important}
+#app .view-tabs button[aria-pressed=true]{border-bottom-color:var(--p);color:var(--p)}
+#app .calendar-grid{border-left:0;border-top:1px solid var(--hairline)}
+#app .calendar-grid>b{background:transparent;border:0;border-bottom:1px solid var(--hairline);font-family:var(--ui);font-size:11px;font-weight:400;padding:10px 0;color:var(--secondary)}
+#app .day{border-right:1px solid #eceaec;border-bottom:1px solid #f2f1f3;background:transparent;padding:7px 5px;min-height:220px}
+#app .day:nth-child(7n){border-right:0}
+#app .day.weekend{background:#fafaf8}
+#app .day.other-month{background:#fafafa}
+#app .day.today{background:transparent}
+#app .day em{font-size:11px;color:var(--quiet);margin:3px 0 12px}
+#app .day.today em{color:#fff;background:var(--p);width:23px;height:23px;line-height:23px;margin:0 auto 10px}
+#app .event{background:transparent;color:var(--text);border-left:3px solid var(--task-accent);border-radius:0;padding:6px 5px;margin:9px 0;font-size:11px;line-height:1.6}
+#app .event:hover{background:#f5f3f8}
+#app .event strong{font-family:var(--display);color:var(--secondary);font-weight:600;font-size:9px;margin:2px 0 4px}
+#app .event-kind{font-size:9px;color:var(--quiet);margin-top:5px}
+#app .calendar-context{font-size:10px;color:var(--quiet);line-height:1.7;margin:14px 0 0}
+#app .month .day{min-height:130px}
+@media(max-width:1200px) and (min-width:761px){#app{padding:30px 24px;grid-template-columns:180px minmax(0,1fr);gap:30px 24px}#app .quarter-intro{grid-template-columns:1fr}#app .course-legend{margin-top:18px}#app .two-panels{grid-template-columns:1fr;gap:32px}#app .todo-panel{padding-right:0;max-height:540px}#app .calendar-panel{padding:28px 0 0;border-left:0;border-top:1px solid var(--hairline)}}
+@media(max-width:760px){
+  #app{margin:20px 0;padding:24px 18px;grid-template-columns:1fr;gap:26px;font-size:13px}
+  #app .quarter-intro{grid-template-columns:1fr;padding-bottom:22px}
+  #app .hero{gap:16px;margin-bottom:20px;align-items:flex-start}
+  #app .hero h2{font-size:28px}#app .hero p{font-size:9px}#app .next-check{font-size:9px}
+  #app .quarter-stats{gap:16px;padding:3px 0 0}#app .quarter-stats>div{min-width:42px}#app .quarter-stats strong{font-size:26px}#app .quarter-stats span{font-size:7px}
+  #app .filters{flex-wrap:nowrap;gap:8px}#app .filters select{min-width:112px;padding:7px;font-size:11px}#app .search-field{min-width:0}#app .filters input{font-size:11px}
+  #app .course-legend{margin-top:18px;gap:10px 14px;flex-wrap:wrap}
+  #app .sidebar{border:0;border-bottom:1px solid var(--hairline);padding:0 0 20px;gap:5px}
+  #app .sidebar h2{display:none}#app .sidebar .course-group{padding:0;margin:0;border:0}
+  #app .sidebar button{font-size:11px;padding:8px;min-height:36px}#app .sidebar b{font-size:11px}
+  #app .sidebar #courseInfo{border:0;color:var(--secondary);padding:6px 0;font-size:10px}
+  #app .two-panels{grid-template-columns:1fr;gap:30px}
+  #app .todo-panel{padding:0;max-height:none;overflow:visible}
+  #app .calendar-panel{padding:28px 0 0;border-left:0;border-top:1px solid var(--hairline)}
+  #app .panel-heading{min-height:60px;margin-bottom:12px}#app .panel-heading h3{font-size:20px}
+  #app .task{grid-template-columns:14px minmax(0,1fr) 62px;gap:9px;padding:20px 0 20px 12px}
+  #app .task b{font-size:14px}#app .task time strong{font-size:13px}
+  #app .calendar-toolbar{grid-template-columns:auto 1fr auto;gap:6px}
+  #app .calendar-toolbar>b{font-size:11px;white-space:normal}
+  #app .calendar-toolbar .view-tabs{grid-column:auto;grid-row:auto;gap:5px}
+  #app .week .day{min-height:0;padding:12px 0;border-right:0;background:transparent}
+  #app .week .day em,#app .week .day.today em{width:auto;height:auto;text-align:left;border-radius:0;padding:3px 8px;margin:0 0 8px;font-size:12px;line-height:1.6}
+  #app .week .event{font-size:13px;padding:10px 12px;margin:8px 0}#app .week .event strong{display:inline;font-size:10px;margin:0 6px}
+}

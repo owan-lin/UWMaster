@@ -189,7 +189,8 @@ class App(SimpleHTTPRequestHandler):
         static_files = ("/", "/index.html", "/app.js", "/style.css",
                         "/assets/uw-logo.svg", "/assets/uw-campus.jpg", "/assets/fonts.css",
                         "/assets/font-1.ttf", "/assets/font-2.ttf",
-                        "/assets/font-3.ttf", "/assets/font-4.ttf")
+                        "/assets/font-3.ttf", "/assets/font-4.ttf",
+                        "/assets/noto-sc-400.ttf", "/assets/noto-sc-600.ttf")
         if self.path not in static_files:
             return self.send_json(404, {"error": "本地静态文件不可访问"})
         return super().do_GET()
