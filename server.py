@@ -186,7 +186,11 @@ class App(SimpleHTTPRequestHandler):
             raw = build_ics(merged_snapshot() or {}).encode("utf-8")
             self.send_response(200); self.send_header("Content-Type", "text/calendar; charset=utf-8"); self.send_header("Content-Disposition", "attachment; filename=uw-uncompleted.ics"); self.send_header("Content-Length", str(len(raw))); self.end_headers(); return self.wfile.write(raw)
         if self.path.startswith("/api/"): return self.send_json(404, {"error": "未知 API"})
-        if self.path not in ("/", "/index.html", "/app.js", "/style.css"):
+        static_files = ("/", "/index.html", "/app.js", "/style.css",
+                        "/assets/uw-logo.svg", "/assets/uw-campus.jpg", "/assets/fonts.css",
+                        "/assets/font-1.ttf", "/assets/font-2.ttf",
+                        "/assets/font-3.ttf", "/assets/font-4.ttf")
+        if self.path not in static_files:
             return self.send_json(404, {"error": "本地静态文件不可访问"})
         return super().do_GET()
     def do_POST(self):

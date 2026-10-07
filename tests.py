@@ -18,6 +18,12 @@ try:
  assert request('POST','/api/task-state',{'id':'t','completed':True,'note':'note'})[0]==200
  h.shutdown();h.server_close();h=start();port=h.server_port
  assert request('GET','/api/data')[1]['tasks'][0]['user_completed'] is True
+ # Brand assets are public; snapshots, notes and arbitrary files remain private.
+ for asset in ('uw-logo.svg','uw-campus.jpg','fonts.css','font-1.ttf','font-2.ttf','font-3.ttf','font-4.ttf'):
+  con=http.client.HTTPConnection('127.0.0.1',port);con.request('GET','/assets/'+asset)
+  response=con.getresponse();assert response.status==200,asset;assert response.read();con.close()
+ for path in ('/snapshot.json','/data/user_state.json','/assets/SOURCES.md','/assets/../snapshot.json'):
+  assert request('GET',path)[0]==404,path
  merged=s.merge_snapshot(snapshot(),snapshot(due='2026-11-03T09:00:00-08:00'));assert len(merged['tasks'])==1 and merged['tasks'][0]['due'].startswith('2026-11-03')
  assert s.merge_snapshot(snapshot(),snapshot('winter'))['term']['id']=='winter'
  ics=s.build_ics({'tasks':[{'id':'a','title':'A','due':'2026-11-02','certainty':'verified'},{'id':'b','title':'B','due':'2026-11-02T09:00:00-08:00','certainty':'verified'},{'id':'c','title':'C','due':None,'certainty':'verified'},{'id':'d','title':'D','due':'2026-11-02','certainty':'tentative'},{'id':'e','title':'E','due':'2026-11-02','certainty':'verified','user_completed':True}]})

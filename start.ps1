@@ -7,7 +7,7 @@ New-Item -ItemType Directory -Force (Join-Path $root 'data') | Out-Null
 function Test-CourseMonitor {
   try {
     $response = Invoke-WebRequest -UseBasicParsing -TimeoutSec 2 'http://127.0.0.1:8765/'
-    return $response.StatusCode -eq 200 -and $response.Content -match 'Semester <em>watch</em>'
+    return $response.StatusCode -eq 200 -and $response.Content -match 'UWMaster'
   } catch { return $false }
 }
 

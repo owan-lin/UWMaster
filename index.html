@@ -1,7 +1,14 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UW Course Monitor</title><link rel="stylesheet" href="style.css"></head><body>
-<header><div><p class="eyebrow">UW · Owan 的本地课程面板</p><h1>Semester <em>watch</em></h1></div><div class="header-actions"><button id="importBtn">导入核查快照</button><button id="backupBtn">下载 JSON 备份</button><button id="icsBtn" class="gold">导出未完成 ICS</button></div></header>
-<main id="app"><div class="loading">正在读取本地快照…</div></main>
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#32006e"><title>UWMaster · Owan 的课程面板</title><link rel="stylesheet" href="assets/fonts.css"><link rel="stylesheet" href="style.css"></head>
+<body>
+<a class="skip-link" href="#app">跳至课程面板</a>
+<header class="masthead"><div class="masthead-inner"><a class="uw-brand" href="https://www.washington.edu/" target="_blank" rel="noopener noreferrer" aria-label="University of Washington 官网"><img src="assets/uw-logo.svg" alt="University of Washington" width="444" height="80"></a><div class="personal-mark"><span class="owner-avatar">O</span><span>Owan <small>个人课程面板</small></span></div></div></header>
+<nav class="utility-bar" aria-label="面板工具"><div class="utility-inner"><a class="app-brand" href="/">UW<span>Master</span></a><div class="header-actions"><button id="importBtn">导入核查快照</button><button id="backupBtn">下载 JSON 备份</button><button id="icsBtn" class="gold">导出未完成 ICS <span aria-hidden="true">↗</span></button></div></div></nav>
+<section class="campus-hero" aria-labelledby="page-title"><div class="hero-inner"><p class="eyebrow">YOUR QUARTER, IN FOCUS</p><h1 id="page-title">Course <span>watch.</span></h1><p class="hero-description">课程、截止时间与每一次进步，都在这里。</p><div class="term-line"><span id="termName">正在读取学期…</span><span>SEATTLE · PACIFIC TIME</span></div></div><span class="photo-caption">UNIVERSITY OF WASHINGTON · SEATTLE CAMPUS</span></section>
+<main id="app" tabindex="-1"><div class="loading" role="status">正在读取本地快照…</div></main>
+<footer class="site-footer"><span>UWMaster <span class="footer-divider">/</span> Owan 的学习空间</span><span>个人项目 · 本地保存 <span class="footer-divider">/</span> 校园素材：University of Washington</span></footer>
 <input id="fileInput" type="file" accept="application/json,.json" hidden>
-<dialog id="detail"><article></article><form method="dialog"><button>关闭</button></form></dialog>
-<dialog id="history"><h2>变更历史</h2><div class="dialog-content"></div><form method="dialog"><button>关闭</button></form></dialog>
+<dialog id="detail" aria-label="任务详情"><article></article><form method="dialog"><button>关闭</button></form></dialog>
+<dialog id="history" aria-labelledby="history-title"><h2 id="history-title">变更历史</h2><div class="dialog-content"></div><form method="dialog"><button>关闭</button></form></dialog>
 <script src="app.js"></script></body></html>
