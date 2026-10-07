@@ -98,10 +98,10 @@ h1{font-size:40px;line-height:1.1;margin:0;letter-spacing:-1.3px}
 
 /* Hero-below academic workspace. All tokens and rules are scoped to this plane. */
 body:has(.quarter-intro){background:#f4f3f0}
-#app{--canvas:#f4f3f0;--surface:#fff;--text:#29252d;--secondary:#6e6873;--quiet:#918c94;--hairline:#e3e0e5;--soft:#f3f0f7;--ui:"Open Sans","Noto Sans SC","PingFang SC",sans-serif;--heading:"Encode Sans","Noto Sans SC","PingFang SC",sans-serif;background:var(--surface);color:var(--text);font-family:var(--ui);margin:32px auto 40px;padding:36px 42px 42px;grid-template-columns:218px minmax(0,1fr);gap:36px 28px}
+#app{--canvas:#f4f3f0;--surface:#fff;--rail:#f3f1f6;--planning:#faf9f6;--intro:#f6f3eb;--text:#29252d;--secondary:#6e6873;--quiet:#918c94;--hairline:#e3e0e5;--soft:#f3f0f7;--ui:"Open Sans","Noto Sans SC","PingFang SC",sans-serif;--heading:"Encode Sans","Noto Sans SC","PingFang SC",sans-serif;background:var(--surface);color:var(--text);font-family:var(--ui);margin:32px auto 40px;padding:36px 42px 42px;grid-template-columns:218px minmax(0,1fr);gap:36px 28px}
 #app h2,#app h3{font-family:var(--heading);font-weight:600}
 #app .section-caption{display:block;font:600 10px/1.5 var(--ui);letter-spacing:.09em;color:var(--secondary);margin:0 0 10px;text-transform:uppercase}
-#app .quarter-intro{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:24px;border-bottom:2px solid var(--p);padding-bottom:26px}
+#app .quarter-intro{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:24px;background:var(--intro);border-bottom:2px solid var(--p);padding:36px 42px 26px;margin:-36px -42px 0}
 #app .hero{grid-column:1/-1;order:0;min-height:0;padding:0;margin:0 0 26px;align-items:center;gap:32px}
 #app .hero h2{font-size:32px;line-height:1.35;letter-spacing:0;margin:0 0 12px}
 #app .hero .section-caption{color:var(--p)}
@@ -124,31 +124,33 @@ body:has(.quarter-intro){background:#f4f3f0}
 #app .course-legend{margin:0;gap:16px;font-size:10px;align-self:center}
 #app .course-legend>span{color:var(--secondary);font-family:var(--display);font-weight:600}
 #app .course-legend i{width:15px;height:2px;border-radius:0}
-#app .sidebar{background:transparent;border:0;border-right:1px solid var(--hairline);padding:0 24px 0 0}
-#app .sidebar h2{font-size:20px;line-height:1.4;letter-spacing:0;margin:0 0 24px}
+#app .sidebar{background:var(--rail);border:0;padding:20px 14px 24px}
+#app .sidebar h2{font-size:18px;line-height:1.4;letter-spacing:0;margin:0 0 18px;color:var(--p)}
 #app .sidebar h2 small{font-size:10px;line-height:1.5;margin:0 0 10px}
-#app .sidebar button{background:transparent;border:0;border-left:3px solid transparent;border-radius:0;margin:0;padding:12px 12px;min-height:38px;color:var(--text)}
-#app .sidebar>button.active,#app .sidebar .course-group>button.active{border-left-color:var(--p);background:var(--soft);color:var(--p)}
-#app .sidebar .course-group{padding-top:14px;margin-top:14px;border-top:1px solid var(--hairline)}
+#app .sidebar button{background:transparent;border:0;border-left:3px solid transparent;border-radius:0;margin:0;padding:10px 10px;min-height:38px;color:var(--text)}
+#app .sidebar>button.active,#app .sidebar .course-group>button.active{border-left-color:var(--p);background:#e9e3f1;color:var(--p)}
+#app .sidebar .course-group{padding-top:10px;margin-top:10px;border-top:1px solid #e3dfe9}
 #app .sidebar .course-group>button{border-left-color:var(--course-accent);color:var(--text)}
 #app .sidebar b{font-family:var(--display);font-size:14px;font-weight:700}
 #app .sidebar small{font-size:11px;font-weight:400;color:var(--secondary);line-height:1.7;margin-top:5px}
 #app .sidebar details{font-size:10px;line-height:1.8;padding:8px 0 0 15px;margin:0;border:0;color:var(--secondary)}
-#app .sidebar summary{font-size:10px;color:var(--quiet)}
+#app .sidebar summary{font-size:10px;color:var(--secondary)}
 #app .workspace{display:block}
 #app .two-panels{grid-template-columns:minmax(310px,4fr) minmax(0,6fr);gap:0;align-items:start}
 #app .todo-panel,#app .calendar-panel{border:0;background:transparent;padding:0;border-radius:0;min-width:0}
 #app .todo-panel{padding-right:28px;max-height:78vh;scrollbar-width:thin}
-#app .calendar-panel{padding-left:28px;border-left:1px solid var(--hairline)}
-#app .panel-heading{position:static;min-height:68px;padding:0;margin:0 0 24px;align-items:flex-start;background:transparent}
-#app .panel-heading h3{font-size:21px;line-height:1.4;letter-spacing:0;font-weight:600}
-#app .panel-heading>span{background:transparent;padding:25px 0 0;font-size:10px;line-height:1.6;color:var(--quiet)}
-#app .task{position:relative;grid-template-columns:16px minmax(0,1fr) 66px;gap:12px;background:transparent;border:0;border-bottom:1px solid var(--hairline);margin:0;padding:22px 0 22px 13px;min-height:105px}
-#app .task:before{content:"";position:absolute;left:0;top:24px;bottom:24px;width:3px;background:var(--task-accent)}
-#app .task:hover{background:#faf9fc}
+#app .calendar-panel{background:var(--planning);padding:20px 16px 20px 24px;border-left:1px solid var(--hairline)}
+#app .panel-heading{position:static;min-height:44px;padding:0 0 14px;margin:0 0 12px;align-items:center;background:transparent;border-bottom:1px solid var(--hairline)}
+#app .panel-heading h3{font-size:22px;line-height:1.4;letter-spacing:0;font-weight:600}
+#app .panel-heading>span{background:transparent;padding:0;font-size:10px;line-height:1.6;color:var(--quiet)}
+#app .todo-panel .panel-heading{border-bottom-color:var(--g);margin-top:20px}
+#app .calendar-panel .panel-heading h3{font-size:20px;color:var(--p)}
+#app .task{position:relative;grid-template-columns:16px minmax(0,1fr) 66px;gap:12px;background:transparent;border:0;border-bottom:1px solid var(--hairline);margin:0;padding:26px 0 26px 15px;min-height:116px}
+#app .task:before{content:"";position:absolute;left:0;top:28px;bottom:28px;width:3px;background:var(--task-accent)}
+#app .task:hover{background:#f3f0f7}
 #app .task input{width:14px;height:14px;margin-top:4px;accent-color:var(--p)}
 #app .task .task-title{font-family:var(--ui);color:var(--text);line-height:1.5}
-#app .task b{font-family:var(--ui);font-size:14px;font-weight:600;line-height:1.5}
+#app .task b{font-family:var(--ui);font-size:15px;font-weight:600;line-height:1.55}
 #app .task .task-title:hover b{color:var(--p)}
 #app .task small{font-size:10.5px;line-height:1.7;margin-top:7px;gap:3px 6px;color:var(--secondary)}
 #app .task .course-code{font-size:10.5px;color:var(--secondary);font-weight:600}
@@ -156,10 +158,11 @@ body:has(.quarter-intro){background:#f4f3f0}
 #app .task .kind-label:before,#app .task .grade-label:before{content:'·';margin-right:6px;color:var(--quiet)}
 #app .task i{background:transparent;border:1px solid var(--hairline);border-radius:0;font-size:9px;padding:0 4px;color:var(--secondary)}
 #app .task i.uncertain{border-color:var(--g);color:var(--heritage)}
-#app .task .task-detail{font-size:10.5px;line-height:1.5;min-height:26px;margin-top:5px;color:var(--secondary);text-decoration:none}
+#app .task .task-detail{font-size:10.5px;line-height:1.5;min-height:26px;margin-top:8px;color:var(--p);text-decoration:none}
+#app .task .task-detail span{display:inline-block;margin-left:3px;font-size:11px}
 #app .task .task-detail:hover{color:var(--p);text-decoration:underline}
 #app .task time{font-size:10px;color:var(--secondary);letter-spacing:.02em;align-self:start;padding-top:1px;line-height:1.8}
-#app .task time strong{font-family:var(--ui);font-weight:600;font-size:14px;color:var(--text)}
+#app .task time strong{font-family:var(--ui);font-weight:600;font-size:16px;color:var(--p)}
 #app .task time small{font-size:9px;margin-top:3px;color:var(--heritage)}
 #app .task time.date-uncertain strong{color:var(--heritage)}
 #app .task.done .task-title b{color:var(--quiet)}
@@ -171,41 +174,41 @@ body:has(.quarter-intro){background:#f4f3f0}
 #app .calendar-toolbar>b{font-family:var(--display);font-weight:600;font-size:12px;color:var(--text);grid-column:auto;grid-row:auto}
 #app .calendar-toolbar .view-tabs{justify-self:end;gap:10px}
 #app .view-tabs button{border-bottom:2px solid transparent;padding:4px 5px;min-width:24px;font-size:12px!important;width:auto!important}
-#app .view-tabs button[aria-pressed=true]{border-bottom-color:var(--p);color:var(--p)}
+#app .view-tabs button[aria-pressed=true]{border-bottom-color:var(--p);background:#ede8f4;color:var(--p);font-weight:600}
 #app .calendar-grid{border-left:0;border-top:1px solid var(--hairline)}
-#app .calendar-grid>b{background:transparent;border:0;border-bottom:1px solid var(--hairline);font-family:var(--ui);font-size:11px;font-weight:400;padding:10px 0;color:var(--secondary)}
-#app .day{border-right:1px solid #eceaec;border-bottom:1px solid #f2f1f3;background:transparent;padding:7px 5px;min-height:220px}
+#app .calendar-grid>b{background:#ede9e1;border:0;border-bottom:1px solid var(--hairline);font-family:var(--ui);font-size:11px;font-weight:400;padding:10px 0;color:var(--secondary)}
+#app .day{border-right:1px solid #e5e1e7;border-bottom:1px solid #ece8ee;background:transparent;padding:7px 5px;min-height:220px}
 #app .day:nth-child(7n){border-right:0}
-#app .day.weekend{background:#fafaf8}
+#app .day.weekend{background:#f1eeea}
 #app .day.other-month{background:#fafafa}
-#app .day.today{background:transparent}
+#app .day.today{background:#f5f1fa}
 #app .day em{font-size:11px;color:var(--quiet);margin:3px 0 12px}
 #app .day.today em{color:#fff;background:var(--p);width:23px;height:23px;line-height:23px;margin:0 auto 10px}
-#app .event{background:transparent;color:var(--text);border-left:3px solid var(--task-accent);border-radius:0;padding:6px 5px;margin:9px 0;font-size:11px;line-height:1.6}
-#app .event:hover{background:#f5f3f8}
-#app .event strong{font-family:var(--display);color:var(--secondary);font-weight:600;font-size:9px;margin:2px 0 4px}
+#app .event{background:#ffffff82;color:var(--text);border-left:3px solid var(--task-accent);border-radius:0;padding:6px 5px;margin:9px 0;font-size:11px;line-height:1.6}
+#app .event:hover{background:#eae4f3}
+#app .event strong{font-family:var(--display);color:var(--course-ink);font-weight:600;font-size:9px;margin:2px 0 4px}
 #app .event-kind{font-size:9px;color:var(--quiet);margin-top:5px}
 #app .calendar-context{font-size:10px;color:var(--quiet);line-height:1.7;margin:14px 0 0}
 #app .month .day{min-height:130px}
-@media(max-width:1200px) and (min-width:761px){#app{padding:30px 24px;grid-template-columns:180px minmax(0,1fr);gap:30px 24px}#app .quarter-intro{grid-template-columns:1fr}#app .course-legend{margin-top:18px}#app .two-panels{grid-template-columns:1fr;gap:32px}#app .todo-panel{padding-right:0;max-height:540px}#app .calendar-panel{padding:28px 0 0;border-left:0;border-top:1px solid var(--hairline)}}
+@media(max-width:1200px) and (min-width:761px){#app{padding:30px 24px;grid-template-columns:180px minmax(0,1fr);gap:30px 24px}#app .quarter-intro{grid-template-columns:1fr;padding:30px 24px 26px;margin:-30px -24px 0}#app .course-legend{margin-top:18px}#app .two-panels{grid-template-columns:1fr;gap:32px}#app .todo-panel{padding-right:0;max-height:540px}#app .calendar-panel{padding:24px 18px;border-left:0;border-top:1px solid var(--hairline)}}
 @media(max-width:760px){
   #app{margin:20px 0;padding:24px 18px;grid-template-columns:1fr;gap:26px;font-size:13px}
-  #app .quarter-intro{grid-template-columns:1fr;padding-bottom:22px}
+  #app .quarter-intro{grid-template-columns:1fr;padding:24px 18px 22px;margin:-24px -18px 0}
   #app .hero{gap:16px;margin-bottom:20px;align-items:flex-start}
   #app .hero h2{font-size:28px}#app .hero p{font-size:9px}#app .next-check{font-size:9px}
   #app .quarter-stats{gap:16px;padding:3px 0 0}#app .quarter-stats>div{min-width:42px}#app .quarter-stats strong{font-size:26px}#app .quarter-stats span{font-size:7px}
   #app .filters{flex-wrap:nowrap;gap:8px}#app .filters select{min-width:112px;padding:7px;font-size:11px}#app .search-field{min-width:0}#app .filters input{font-size:11px}
   #app .course-legend{margin-top:18px;gap:10px 14px;flex-wrap:wrap}
-  #app .sidebar{border:0;border-bottom:1px solid var(--hairline);padding:0 0 20px;gap:5px}
+  #app .sidebar{border:0;padding:14px 10px;gap:5px}
   #app .sidebar h2{display:none}#app .sidebar .course-group{padding:0;margin:0;border:0}
   #app .sidebar button{font-size:11px;padding:8px;min-height:36px}#app .sidebar b{font-size:11px}
   #app .sidebar #courseInfo{border:0;color:var(--secondary);padding:6px 0;font-size:10px}
   #app .two-panels{grid-template-columns:1fr;gap:30px}
   #app .todo-panel{padding:0;max-height:none;overflow:visible}
-  #app .calendar-panel{padding:28px 0 0;border-left:0;border-top:1px solid var(--hairline)}
-  #app .panel-heading{min-height:60px;margin-bottom:12px}#app .panel-heading h3{font-size:20px}
+  #app .calendar-panel{padding:24px 18px;border-left:0;border-top:1px solid var(--hairline)}
+  #app .panel-heading{min-height:44px;margin-bottom:12px}#app .todo-panel .panel-heading{margin-top:0}#app .panel-heading h3{font-size:20px}
   #app .task{grid-template-columns:14px minmax(0,1fr) 62px;gap:9px;padding:20px 0 20px 12px}
-  #app .task b{font-size:14px}#app .task time strong{font-size:13px}
+  #app .task b{font-size:14px}#app .task time strong{font-size:15px}
   #app .calendar-toolbar{grid-template-columns:auto 1fr auto;gap:6px}
   #app .calendar-toolbar>b{font-size:11px;white-space:normal}
   #app .calendar-toolbar .view-tabs{grid-column:auto;grid-row:auto;gap:5px}
@@ -213,3 +216,125 @@ body:has(.quarter-intro){background:#f4f3f0}
   #app .week .day em,#app .week .day.today em{width:auto;height:auto;text-align:left;border-radius:0;padding:3px 8px;margin:0 0 8px;font-size:12px;line-height:1.6}
   #app .week .event{font-size:13px;padding:10px 12px;margin:8px 0}#app .week .event strong{display:inline;font-size:10px;margin:0 6px}
 }
+
+/* Course navigation and compact task stream; white calendar with typographic events. */
+#app{--intro:#fff;--rail:#fff;--planning:#fff;--hairline:#e4e0e8}
+body:has(.quarter-intro){background:#fff}
+#app .sidebar{background:#fff}
+#app .sidebar h2{color:var(--p)}
+#app .sidebar button,#app .sidebar .course-group>button{background:#fff;color:var(--text);border-left:3px solid var(--course-accent,var(--p))}
+#app .sidebar>button[data-course=all]{border-left-color:var(--p)}
+#app .sidebar>button.active{background:rgba(75,46,131,.085);color:var(--p);border-left-color:var(--p)}
+#app .sidebar .course-group>button.active{background:var(--course-soft);color:var(--course-ink);border-left-color:var(--course-accent)}
+#app .sidebar button:hover{background:#faf9fc}
+#app .sidebar .course-group>button.active:hover{background:var(--course-soft)}
+#app .sidebar small,#app .sidebar summary,#app .sidebar details{color:var(--secondary)}
+#app .sidebar .course-group{border-color:var(--hairline)}
+#app .sidebar #courseInfo{border-left:0;background:transparent}
+#app .todo-panel{background:#fff;padding:20px 16px 4px 0;max-height:78vh;overflow-y:auto;scrollbar-width:none;scrollbar-gutter:auto}
+#app .todo-panel::-webkit-scrollbar{display:none;width:0;height:0}
+#app .todo-panel .panel-heading{margin-top:0;margin-right:4px}
+#app .two-panels{column-gap:20px}
+#app .task{background:var(--task-bg);border:0;border-left:3px solid var(--task-accent);margin:6px 4px 6px 0;padding:12px 9px;min-height:0;column-gap:9px;grid-template-columns:15px minmax(0,1fr) 66px}
+#app .task:before{display:none}
+#app .task:hover{background:var(--task-hover)}
+#app .task input{width:14px;height:14px;accent-color:var(--course-accent)}
+#app .task .task-content,#app .task time{background:transparent}
+#app .task b{font-size:14px;line-height:1.45}
+#app .task small{margin-top:4px;line-height:1.65}
+#app .task .course-code,#app .task time strong{color:var(--course-ink)}
+#app .task time{font-size:10px;line-height:1.6}
+#app .task time strong{font-size:14px;line-height:1.65}
+#app .task .task-detail{margin-top:3px;min-height:22px;padding:2px 0;font-size:10px;color:var(--course-ink)}
+#app .calendar-panel{background:#fff;border-left:1px solid var(--hairline);padding:20px 0 20px 24px}
+#app .calendar-toolbar{margin-bottom:16px;min-height:34px}
+#app .calendar-toolbar>b{font-size:13px;font-weight:600}
+#app .calendar-grid{border-top:0}
+#app .calendar-grid>b{background:#fff;color:var(--secondary);font-size:11px;font-weight:600;border-bottom:1px solid var(--hairline);padding:9px 0}
+#app .day,#app .day.weekend,#app .day.today{background:#fff;border-color:#eeeaf1;padding:9px 6px}
+#app .day.other-month{background:#faf9fc}
+#app .day em{font-size:11px;margin:2px 0 14px;color:var(--secondary)}
+#app .day.today em{background:var(--p);color:#fff}
+#app .event{background:transparent;border-left:2px solid var(--task-accent);border-bottom:1px solid color-mix(in srgb,var(--course-accent) 14%,white);padding:7px 5px 9px;margin:10px 0 14px;font-size:11px;color:var(--text);line-height:1.5}
+#app .event:hover{background:color-mix(in srgb,var(--course-accent) 6%,white)}
+#app .event-time{display:block;font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--course-ink);line-height:1.6}
+#app .event strong{display:block;font-size:9px;font-weight:700;letter-spacing:.02em;color:var(--course-ink);margin:3px 0 5px;white-space:nowrap}
+#app .event-title{display:block;font-size:11px;line-height:1.6;text-wrap:pretty}
+#app .event-kind{font-size:9px;line-height:1.5;margin-top:6px;color:var(--secondary)}
+#app .view-tabs button[aria-pressed=true]{background:rgba(75,46,131,.055);border-bottom-color:var(--p)}
+@media(max-width:1200px) and (min-width:761px){#app .two-panels{gap:28px}#app .todo-panel{max-height:540px;padding-right:12px}#app .calendar-panel{border-left:0;border-top:1px solid var(--hairline);padding:24px 0 0}}
+@media(max-width:760px){
+  #app .sidebar{padding:10px 0}
+  #app .todo-panel{padding:0;max-height:none;overflow:visible;scrollbar-gutter:auto}
+  #app .task{grid-template-columns:14px minmax(0,1fr) 62px;padding:12px 8px;gap:8px;margin-right:0}
+  #app .task b{font-size:13px}#app .task time strong{font-size:13px}
+  #app .calendar-panel{border-left:0;border-top:1px solid var(--hairline);padding:24px 0 0}
+  #app .week .day{padding:12px 0;min-height:0;border-right:0}
+  #app .week .day em,#app .week .day.today em{width:auto;height:auto;margin:0 0 9px;padding:3px 8px;line-height:1.6}
+  #app .week .event{display:grid;grid-template-columns:48px 1fr;column-gap:12px;row-gap:3px;padding:10px 12px;margin:8px 0}
+  #app .week .event-time{grid-column:1;grid-row:1/4}
+  #app .week .event strong{grid-column:2;margin:0;display:block;font-size:10px}
+  #app .week .event-title,#app .week .event-kind{grid-column:2;margin:0}
+  #app .week .event-title{font-size:13px}
+}
+
+/* Stable calendar sheets: long attendance strips, compact deadline strips. */
+#app .calendar-scroll{overflow:visible}
+#app .calendar-grid{height:600px;grid-template-rows:34px minmax(0,1fr)}
+#app .week .day{min-height:0;height:100%;display:flex;flex-direction:column;overflow:hidden}
+#app .week .day em{flex:none;height:24px;line-height:24px}
+#app .day-events{min-height:0;flex:1;overflow-y:auto;scrollbar-width:none}
+#app .day-events::-webkit-scrollbar{display:none}
+#app .week .event{margin:0 0 8px;padding:8px 5px;overflow:hidden;background:var(--task-bg);border-bottom:0}
+#app .week .event-class{height:154px}
+#app .week .event-deadline{height:82px}
+#app .week .event-title{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}
+#app .week .event-deadline .event-title{-webkit-line-clamp:1}
+#app .week .event-kind{margin-top:4px}
+#app .month{grid-template-rows:34px repeat(6,minmax(0,1fr));min-width:0}
+#app .month .day{position:relative;min-height:0;height:100%;padding:8px;outline:none}
+#app .month .day em{margin:0 0 10px;height:24px;line-height:24px}
+#app .month .day:hover,#app .month .day:focus-within{background:#faf9fc;z-index:5}
+#app .day-markers{display:flex;flex-wrap:wrap;gap:4px;max-height:36px;overflow:hidden}
+#app .day-marker{width:8px;height:8px;flex:none;background:var(--task-accent);border:0;opacity:.72}
+
+#app .date-popover{display:none;position:absolute;top:0;left:calc(100% - 1px);width:280px;max-height:350px;background:#fff;border:1px solid #d9d3e1;border-top:3px solid var(--p);z-index:10;padding:14px;color:var(--text)}
+#app .popover-left .date-popover{left:auto;right:calc(100% - 1px)}
+#app .popover-up .date-popover{top:auto;bottom:0}
+#app .month .day:hover .date-popover,#app .month .day:focus-within .date-popover{display:block}
+#app .date-popover header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:14px}
+#app .date-popover header span{font-size:10px;color:var(--secondary)}
+#app .popover-tasks{max-height:280px;overflow-y:auto;overscroll-behavior:contain}
+#app .date-popover .event{margin:0 0 8px;padding:8px;background:var(--task-bg)}
+#app .date-popover .event-title{font-size:12px}
+#app .calendar-scroll:has(.month):before{display:none}
+@media(max-width:760px){
+ #app .calendar-grid.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));height:500px;min-width:630px}
+ #app .calendar-scroll:has(.week){overflow-x:auto}
+ #app .week.calendar-grid>b{display:block}
+ #app .week .day{padding:8px 5px;border-right:1px solid var(--hairline)}
+ #app .week .day .mobile-date{display:none}
+ #app .week .day em,#app .week .day.today em{width:23px;padding:0;text-align:center;margin:0 auto 12px;border-radius:50%}
+ #app .week .event{display:block;font-size:11px;padding:8px 5px;margin:0 0 8px}
+ #app .week .event strong{margin:3px 0 5px;font-size:9px}
+ #app .week .event-title{font-size:11px}
+ #app .month{height:500px}
+ #app .month .day{padding:6px 3px}
+ #app .month .day .mobile-date{display:none}
+ #app .day-markers{gap:3px}
+ #app .day-marker{width:6px;height:6px}
+ #app .date-popover{width:245px;left:0;top:100%}
+ #app .popover-left .date-popover{right:0;left:auto}
+ #app .popover-up .date-popover{top:auto;bottom:100%}
+}
+
+@media(max-width:760px){#app .month .date-popover{left:calc(-1 * var(--day-column) * 100%);right:auto;width:min(280px,calc(100vw - 64px))}}
+
+/* Lower-left monthly markers and concise weekly deadline labels. */
+#app .month .day-markers{position:absolute;left:8px;bottom:8px;display:grid;grid-template-columns:repeat(var(--marker-columns),8px);grid-auto-rows:8px;gap:5px;max-height:45px}
+#app .week .event-deadline{height:60px;padding:6px 5px}
+#app .week .event-deadline .event-time{font-size:10px;line-height:1.3}
+#app .week .event-deadline strong{font-size:9px;line-height:1.3;margin:2px 0}
+#app .week .event-deadline .event-title{font-size:10px;line-height:1.4}
+#app .week .event-deadline .event-kind{display:none}
+@media(max-width:760px){#app .month .day-markers{left:6px;bottom:6px;grid-template-columns:repeat(var(--marker-columns),6px);grid-auto-rows:6px;gap:4px}}
