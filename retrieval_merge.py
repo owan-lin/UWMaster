@@ -71,7 +71,7 @@ def reconcile(base, current, result, evidence, selected, cutoff, states=None):
     for observation in result.get("observations", []):
         tid, course, url = observation.get("task_id"), observation.get("course_id"), observation.get("source_url")
         quote = observation.get("evidence", "")
-        if course not in selected or url not in sources or not isinstance(quote, str) or len(normalized(quote)) < 8 or normalized(quote) not in normalized(sources[url].get("text", "")):
+        if course not in selected or url not in sources or course not in sources[url].get("course_ids", selected) or not isinstance(quote, str) or len(normalized(quote)) < 8 or normalized(quote) not in normalized(sources[url].get("text", "")):
             issue("rejected", tid, None, "缺少本次已读取来源中的有效原文证据，未应用。")
             continue
         fields = {}
@@ -146,11 +146,16 @@ def reconcile(base, current, result, evidence, selected, cutoff, states=None):
         if not before and (not task.get("title") or "due" not in task or not task.get("kind")):
             issue("rejected", tid, None, "新增任务关键字段有冲突，未创建。")
             continue
+        if not before: task.setdefault("certainty", "needs_confirmation")
+        if task.get("completion_status") in {"completed", "not_completed"}:
+            task["source_status"] = task["completion_status"]
         task["checked_at"] = cutoff.isoformat()
         saved = (states or {}).get(tid, {})
         if saved.get("completed") and (task.get("submission_status") == "not_submitted" or task.get("completion_status") == "not_completed" or task.get("source_status") == "not_completed"):
+            task["needs_review"] = True
             issue("notices", tid, "completion", "你已标记完成，但平台明确显示未提交或未完成；个人完成记录已保留。", source_url=proposal["source_url"])
         if before and saved.get("completed") and task.get("description") != before.get("description"):
+            task["needs_review"] = True
             issue("notices", tid, "requirements", "已完成任务的内容发生变化，请复核是否有新增要求；个人完成记录已保留。")
         fields = [k for k in FIELDS if (before or {}).get(k) != task.get(k)]
         if before is None or fields:

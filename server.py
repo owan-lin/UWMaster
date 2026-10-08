@@ -11,6 +11,9 @@ import shutil
 import sys
 import tempfile
 import threading
+import beta
+import retrieval_flow
+from types import SimpleNamespace
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
@@ -91,6 +94,7 @@ def validate_snapshot(s):
 def source_snapshot():
     return read_json(SNAPSHOT, None)
 
+
 def merge_snapshot(old, incoming):
     """Never erase a prior task merely because a single source run omitted it."""
     if not old or old.get("term", {}).get("id") != incoming.get("term", {}).get("id"): return incoming
@@ -105,6 +109,7 @@ def build_ics(snapshot):
     lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//UW Course Monitor//EN"]
     stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     for task in snapshot.get("tasks", []):
+        if task.get("lifecycle") in {"cancelled", "excluded"}: continue
         if task.get("user_completed") or task.get("source_status") == "completed" or task.get("certainty") != "verified" or not task.get("due"): continue
         raw = task["due"]
         if len(raw) == 10:
@@ -176,6 +181,22 @@ class App(SimpleHTTPRequestHandler):
         if length <= 0 or length > MAX_BODY: raise ValueError("请求体为空或超过 2 MB 限制")
         return json.loads(self.rfile.read(length).decode("utf-8"))
     def do_GET(self):
+        if self.path.startswith("/api/retrieval/runs/") or self.path in ("/api/retrieval/latest", "/api/retrieval/connections", "/api/retrieval/recent"):
+            if not self.allowed(): return self.send_json(403, {"error": "请求来源未获允许"})
+            module = SimpleNamespace(**globals())
+            try:
+                if self.path == "/api/retrieval/connections": return self.send_json(200, retrieval_flow.connections())
+                if self.path == "/api/retrieval/latest": return self.send_json(200, retrieval_flow.latest(module))
+                if self.path == "/api/retrieval/recent": return self.send_json(200, retrieval_flow.recent(module))
+                return self.send_json(200, retrieval_flow.public_job(retrieval_flow.read(module, self.path.rsplit("/", 1)[-1])))
+            except ValueError as e: return self.send_json(404, {"error": str(e)})
+        if self.path.startswith("/api/retrieval/job/"):
+            if not self.allowed(): return self.send_json(403, {"error": "请求来源未获允许"})
+            try: return self.send_json(200, beta.retrieval_status(self.path.rsplit("/", 1)[-1]))
+            except ValueError as e: return self.send_json(404, {"error": str(e)})
+        if self.path == "/api/retrieval/settings":
+            if not self.allowed(): return self.send_json(403, {"error": "请求来源未获允许"})
+            return self.send_json(200, beta.load_settings(SimpleNamespace(**globals())))
         if self.path == "/api/data":
             snap = merged_snapshot()
             if not snap: return self.send_json(404, {"error": "还没有 snapshot.json。请放入符合 schema v1 的快照后刷新。"})
@@ -186,7 +207,7 @@ class App(SimpleHTTPRequestHandler):
             raw = build_ics(merged_snapshot() or {}).encode("utf-8")
             self.send_response(200); self.send_header("Content-Type", "text/calendar; charset=utf-8"); self.send_header("Content-Disposition", "attachment; filename=uw-uncompleted.ics"); self.send_header("Content-Length", str(len(raw))); self.end_headers(); return self.wfile.write(raw)
         if self.path.startswith("/api/"): return self.send_json(404, {"error": "未知 API"})
-        static_files = ("/", "/index.html", "/app.js", "/style.css",
+        static_files = ("/", "/index.html", "/app.js", "/style.css", "/retrieval.html", "/retrieval.js", "/retrieval.css", "/retrieval_assistant.js", "/retrieval_assistant.css",
                         "/assets/uw-logo.svg", "/assets/uw-campus.jpg", "/assets/fonts.css",
                         "/assets/font-1.ttf", "/assets/font-2.ttf",
                         "/assets/font-3.ttf", "/assets/font-4.ttf",
@@ -197,6 +218,36 @@ class App(SimpleHTTPRequestHandler):
     def do_POST(self):
         try:
             body = self.read_body()
+            if self.path.startswith("/api/retrieval/"):
+                module = SimpleNamespace(**globals())
+                if self.path == "/api/retrieval/connect":
+                    settings = beta.load_settings(module)
+                    if body.get("url") not in {u for c in settings["courses"] for u in c["sources"]}: raise ValueError("请使用已保存的课程来源连接浏览器。")
+                    return self.send_json(202, retrieval_flow.course_collector.BROWSER.connect(body["url"]))
+                if self.path == "/api/retrieval/disconnect":
+                    return self.send_json(202, retrieval_flow.course_collector.BROWSER.disconnect())
+                if self.path == "/api/retrieval/messages":
+                    return self.send_json(202, retrieval_flow.message(module, body.get("id"), body.get("content")))
+                if self.path == "/api/retrieval/cancel":
+                    return self.send_json(200, retrieval_flow.cancel(module, body.get("id")))
+                with LOCK:
+                    if self.path == "/api/retrieval/run":
+                        return self.send_json(202, retrieval_flow.start(module, body.get("course_id", "all")))
+                    if self.path == "/api/retrieval/resolve":
+                        return self.send_json(200, retrieval_flow.resolve(module, body))
+                    if self.path == "/api/retrieval/settings":
+                        settings = beta.validate_settings(body, source_snapshot())
+                        atomic_write(DATA / "retrieval_settings.json", settings)
+                        return self.send_json(200, {"ok": True})
+                    if self.path == "/api/retrieval/request":
+                        return self.send_json(200, beta.request_bundle(module, body.get("course_id", "all")))
+                    if self.path == "/api/retrieval/start":
+                        return self.send_json(202, beta.start_retrieval(module, body.get("course_id", "all")))
+                    if self.path == "/api/retrieval/preview":
+                        return self.send_json(200, beta.prepare_preview(module, body.get("snapshot")))
+                    if self.path == "/api/retrieval/apply":
+                        return self.send_json(200, beta.apply_preview(module, body.get("id")))
+                return self.send_json(404, {"error": "未知检索操作"})
             if self.path == "/api/task-state":
                 tid = body.get("id"); completed = body.get("completed"); note = body.get("note", "")
                 if not isinstance(tid, str) or not isinstance(completed, bool) or not isinstance(note, str) or len(note) > 4000: raise ValueError("任务状态字段无效")
@@ -225,6 +276,7 @@ def main():
     p = argparse.ArgumentParser(); p.add_argument("--port", type=int, default=8765); args = p.parse_args()
     if args.port != 8765: raise SystemExit("本应用固定使用端口 8765。")
     os.chdir(ROOT); DATA.mkdir(exist_ok=True)
+    retrieval_flow.recover(SimpleNamespace(**globals()))
     print("UW Course Monitor: http://127.0.0.1:8765")
     ThreadingHTTPServer(("127.0.0.1", 8765), App).serve_forever()
 if __name__ == "__main__": main()
