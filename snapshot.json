@@ -33,41 +33,125 @@
       "coverage": [
         {
           "name": "Canvas 作业与课程模块",
-          "status": "verified",
-          "note": "已读取已发布项目、截止时间和已返回的分数。",
-          "url": "https://canvas.uw.edu/courses/1920200/assignments"
+          "status": "blocked",
+          "note": "请先连接课程浏览器并自行登录。",
+          "url": "https://canvas.uw.edu/courses/1920200/assignments",
+          "checked_at": "2026-10-08T12:29:38-07:00"
         },
         {
           "name": "课程大纲与考试日历",
-          "status": "verified",
-          "note": "已读取 Autumn 2026 PDF 日历；期末日期、时间、地点与 MyUW 交叉核对。",
-          "url": "https://sites.math.washington.edu/~aloveles/Math126Materials/Math126Fall2026Calendar.pdf"
+          "status": "read",
+          "note": "已读取 PDF 文字。",
+          "url": "https://sites.math.washington.edu/~aloveles/Math126Materials/Math126Fall2026Calendar.pdf",
+          "checked_at": "2026-10-08T12:29:38-07:00"
         },
         {
           "name": "WebAssign",
           "status": "blocked",
-          "note": "从 Canvas 的 Cengage Course Link 进入后显示 PAYMENT REQUIRED，并要求 access code 或 Temporary Access；本轮未继续开通或购买，无法直接复核作业截止。",
-          "url": "https://canvas.uw.edu/courses/1920200/modules/items/27500390"
+          "note": "请先连接课程浏览器并自行登录。",
+          "url": "https://canvas.uw.edu/courses/1920200/modules/items/27500390",
+          "checked_at": "2026-10-08T12:29:39-07:00"
         },
         {
           "name": "最新公告 / Ed",
-          "status": "verified",
-          "note": "已读取全部 3 条 Canvas 公告和当前 Ed 通知列表；未找到额外的计分任务公告。",
-          "url": "https://edstem.org/us/courses/107314/discussion"
+          "status": "blocked",
+          "note": "请先连接课程浏览器并自行登录。",
+          "url": "https://edstem.org/us/courses/107314/discussion",
+          "checked_at": "2026-10-08T12:29:39-07:00"
         },
         {
           "name": "Gradescope worksheet 提交",
-          "status": "verified",
-          "note": "Week 2 Tues WS 明确 No Submission，10/06 20:00 PDT 截止；Week 1 Thurs TP 已 Submitted。",
-          "url": "https://www.gradescope.com/courses/1397763"
+          "status": "blocked",
+          "note": "请先连接课程浏览器并自行登录。",
+          "url": "https://www.gradescope.com/courses/1397763",
+          "checked_at": "2026-10-08T12:29:39-07:00"
         },
         {
           "name": "Syllabus 评分规则",
-          "status": "verified",
-          "note": "作业 5%；Worksheet / Test Prep 10%；调查及其他作业 2%；两次期中各 24%；期末 35%。",
-          "url": "https://sites.math.washington.edu/~aloveles/Math126Materials/syllabus.pdf"
+          "status": "read",
+          "note": "已读取 PDF 文字。",
+          "url": "https://sites.math.washington.edu/~aloveles/Math126Materials/syllabus.pdf",
+          "checked_at": "2026-10-08T12:29:40-07:00"
+        },
+        {
+          "name": "https://canvas.uw.edu/courses/1920200",
+          "url": "https://canvas.uw.edu/courses/1920200",
+          "status": "blocked",
+          "checked_at": "2026-10-08T12:29:38-07:00",
+          "note": "请先连接课程浏览器并自行登录。"
+        },
+        {
+          "name": "https://canvas.uw.edu/courses/1920200/assignments/11699024",
+          "url": "https://canvas.uw.edu/courses/1920200/assignments/11699024",
+          "status": "blocked",
+          "checked_at": "2026-10-08T12:29:40-07:00",
+          "note": "请先连接课程浏览器并自行登录。"
+        },
+        {
+          "name": "https://canvas.uw.edu/courses/1920200/assignments/11783799",
+          "url": "https://canvas.uw.edu/courses/1920200/assignments/11783799",
+          "status": "blocked",
+          "checked_at": "2026-10-08T12:29:41-07:00",
+          "note": "请先连接课程浏览器并自行登录。"
+        },
+        {
+          "name": "https://canvas.uw.edu/courses/1920200/assignments/11783800",
+          "url": "https://canvas.uw.edu/courses/1920200/assignments/11783800",
+          "status": "blocked",
+          "checked_at": "2026-10-08T12:29:42-07:00",
+          "note": "请先连接课程浏览器并自行登录。"
+        },
+        {
+          "name": "https://canvas.uw.edu/courses/1920200/assignments/11699025",
+          "url": "https://canvas.uw.edu/courses/1920200/assignments/11699025",
+          "status": "blocked",
+          "checked_at": "2026-10-08T12:29:43-07:00",
+          "note": "请先连接课程浏览器并自行登录。"
+        },
+        {
+          "name": "https://canvas.uw.edu/courses/1920200/assignments/11783802",
+          "url": "https://canvas.uw.edu/courses/1920200/assignments/11783802",
+          "status": "blocked",
+          "checked_at": "2026-10-08T12:29:43-07:00",
+          "note": "请先连接课程浏览器并自行登录。"
+        },
+        {
+          "name": "https://canvas.uw.edu/courses/1920200/assignments/11783801",
+          "url": "https://canvas.uw.edu/courses/1920200/assignments/11783801",
+          "status": "blocked",
+          "checked_at": "2026-10-08T12:29:44-07:00",
+          "note": "请先连接课程浏览器并自行登录。"
+        },
+        {
+          "name": "https://canvas.uw.edu/courses/1920200/assignments/11783803",
+          "url": "https://canvas.uw.edu/courses/1920200/assignments/11783803",
+          "status": "blocked",
+          "checked_at": "2026-10-08T12:29:45-07:00",
+          "note": "请先连接课程浏览器并自行登录。"
+        },
+        {
+          "name": "https://canvas.uw.edu/courses/1920200/assignments/11783804",
+          "url": "https://canvas.uw.edu/courses/1920200/assignments/11783804",
+          "status": "blocked",
+          "checked_at": "2026-10-08T12:29:46-07:00",
+          "note": "请先连接课程浏览器并自行登录。"
+        },
+        {
+          "name": "https://canvas.uw.edu/courses/1920200/assignments/11698955",
+          "url": "https://canvas.uw.edu/courses/1920200/assignments/11698955",
+          "status": "blocked",
+          "checked_at": "2026-10-08T12:29:47-07:00",
+          "note": "请先连接课程浏览器并自行登录。"
+        },
+        {
+          "name": "https://canvas.uw.edu/courses/1920200/assignments/11699023",
+          "url": "https://canvas.uw.edu/courses/1920200/assignments/11699023",
+          "status": "blocked",
+          "checked_at": "2026-10-08T12:29:47-07:00",
+          "note": "请先连接课程浏览器并自行登录。"
         }
-      ]
+      ],
+      "retrieval_checked_at": "2026-10-08T12:30:58-07:00"
     },
     {
       "id": "cse123",
@@ -85,35 +169,97 @@
       "coverage": [
         {
           "name": "Canvas / 课程官网 / 大纲",
-          "status": "verified",
-          "note": "官网提示仍在开发；项目详情页未发布具体项目；仅明确日期的考试录入时间。",
-          "url": "https://courses.cs.washington.edu/courses/cse123/26au/"
+          "status": "read",
+          "note": "已读取公开页面文字。",
+          "url": "https://courses.cs.washington.edu/courses/cse123/26au/",
+          "checked_at": "2026-10-08T12:32:25-07:00"
         },
         {
           "name": "Ed 课程材料与最新公告",
-          "status": "verified",
-          "note": "先前记录将 lecture 到课列为计分事项；Owan 于 2026-10-06 更正：lecture 非必到，PreLect 计分。Ciphers 将于 10/07 发布，截止尚未公布。",
-          "url": "https://edstem.org/us/courses/106640/discussion/8359564"
+          "status": "blocked",
+          "note": "登录尚未完成或已过期。",
+          "url": "https://edstem.org/us/courses/106640/discussion/8359564",
+          "checked_at": "2026-10-08T12:32:32-07:00"
         },
         {
           "name": "个人期末考试",
-          "status": "verified",
-          "note": "MyUW：12 月 16 日 CSE 123 B，KNE 110；课程官网：12:30–14:20。",
-          "url": "https://my.uw.edu/academics/"
+          "status": "read",
+          "note": "已读取浏览器页面；浏览可能触发平台的阅读标记，不能据此推断整项完成。",
+          "url": "https://my.uw.edu/academics/",
+          "checked_at": "2026-10-08T12:32:36-07:00"
         },
         {
           "name": "Syllabus 评分与补考规则",
-          "status": "verified",
-          "note": "共 40 个 ESN：项目 4、Computer Quiz 16、Paper Quiz 16、代码质量 3、Participation 1。学期末一次项目重交与对应 Computer Quiz retake；期末可覆盖前三次 Paper Quiz 各一道题。Owan 于 2026-10-06 更正：lecture 非必到，PreLect 计分；具体 PreLect 分值与权重尚未补充。",
-          "url": "https://courses.cs.washington.edu/courses/cse123/26au/syllabus/"
+          "status": "read",
+          "note": "已读取公开页面文字。",
+          "url": "https://courses.cs.washington.edu/courses/cse123/26au/syllabus/",
+          "checked_at": "2026-10-08T12:32:36-07:00"
         },
         {
           "name": "PreLect（计分课前任务）",
-          "status": "verified",
-          "note": "Ed已发布Pre-Class Work 1（已完成）与2（未开始）；2对应10/07。按个人B班11:30课前完成提醒，保留平台13:30标签。后续未发布材料不虚构。 Owan 于 2026-10-06 更正其计分性质；具体分值与权重未提供。",
-          "url": "https://edstem.org/us/courses/106640/lessons"
+          "status": "blocked",
+          "note": "登录尚未完成或已过期。",
+          "url": "https://edstem.org/us/courses/106640/lessons",
+          "checked_at": "2026-10-08T12:32:38-07:00"
+        },
+        {
+          "name": "https://canvas.uw.edu/courses/1916719",
+          "url": "https://canvas.uw.edu/courses/1916719",
+          "status": "read",
+          "checked_at": "2026-10-08T12:32:30-07:00",
+          "note": "已读取浏览器页面；浏览可能触发平台的阅读标记，不能据此推断整项完成。"
+        },
+        {
+          "name": "https://edstem.org/us/courses/106640/lessons/184530",
+          "url": "https://edstem.org/us/courses/106640/lessons/184530",
+          "status": "blocked",
+          "checked_at": "2026-10-08T12:32:40-07:00",
+          "note": "登录尚未完成或已过期。"
+        },
+        {
+          "name": "https://courses.cs.washington.edu/courses/cse123/26au/assignments/",
+          "url": "https://courses.cs.washington.edu/courses/cse123/26au/assignments/",
+          "status": "read",
+          "checked_at": "2026-10-08T12:32:40-07:00",
+          "note": "已读取公开页面文字。"
+        },
+        {
+          "name": "https://courses.cs.washington.edu/courses/cse123/26au/lectures/0/0.pdf",
+          "url": "https://courses.cs.washington.edu/courses/cse123/26au/lectures/0/0.pdf",
+          "status": "read",
+          "checked_at": "2026-10-08T12:32:41-07:00",
+          "note": "已读取 PDF 文字。"
+        },
+        {
+          "name": "https://courses.cs.washington.edu/courses/cse123/26au/lectures/1/1.pdf",
+          "url": "https://courses.cs.washington.edu/courses/cse123/26au/lectures/1/1.pdf",
+          "status": "read",
+          "checked_at": "2026-10-08T12:32:41-07:00",
+          "note": "已读取 PDF 文字。"
+        },
+        {
+          "name": "https://courses.cs.washington.edu/courses/cse123/26au/lectures/2/2.pdf",
+          "url": "https://courses.cs.washington.edu/courses/cse123/26au/lectures/2/2.pdf",
+          "status": "read",
+          "checked_at": "2026-10-08T12:32:41-07:00",
+          "note": "已读取 PDF 文字。"
+        },
+        {
+          "name": "https://canvas.uw.edu/courses/1916719/assignments/syllabus",
+          "url": "https://canvas.uw.edu/courses/1916719/assignments/syllabus",
+          "status": "read",
+          "checked_at": "2026-10-08T12:32:45-07:00",
+          "note": "已读取浏览器页面；浏览可能触发平台的阅读标记，不能据此推断整项完成。"
+        },
+        {
+          "name": "https://courses.cs.washington.edu/courses/cse123/26au/resources/junit.pdf",
+          "url": "https://courses.cs.washington.edu/courses/cse123/26au/resources/junit.pdf",
+          "status": "read",
+          "checked_at": "2026-10-08T12:32:46-07:00",
+          "note": "已读取 PDF 文字。"
         }
-      ]
+      ],
+      "retrieval_checked_at": "2026-10-08T12:33:56-07:00"
     },
     {
       "id": "cse190",
@@ -404,8 +550,16 @@
       "source_note": "课程日历已列出项目；网页采用跨多行时间块，正式截止日期未在详情页核实。",
       "description": "请在 Ed 核对项目发布和正式截止。官网仍在开发，不能把时间块起始日当作截止日。",
       "source_status": "unknown",
-      "checked_at": "2026-10-06T13:46:00-07:00",
-      "available_from": "2026-10-07"
+      "checked_at": "2026-10-08T19:32:25.006610+00:00",
+      "available_from": "2026-10-08",
+      "field_evidence": {
+        "available_from": {
+          "value": "2026-10-08",
+          "source_url": "https://courses.cs.washington.edu/courses/cse123/26au/lectures/2/2.pdf",
+          "evidence": "Programming Assignment 0 will be released tomorrow, Thursday, Oct 8 and is due Wednesday, Oct 21",
+          "checked_at": "2026-10-08T19:32:25.006610+00:00"
+        }
+      }
     },
     {
       "id": "cse123-p1",
@@ -570,7 +724,8 @@
       "description": "KNE 110；包括第四次 Paper Quiz；以临近考试通知为准。 大纲另规定期末可覆盖前三次 Paper Quiz 各一道题的成绩。",
       "source_status": "unknown",
       "checked_at": "2026-10-06T13:46:00-07:00",
-      "end": "2026-12-16T14:20:00-08:00"
+      "end": "2026-12-16T14:20:00-08:00",
+      "needs_review": true
     },
     {
       "id": "canvas-11765227",

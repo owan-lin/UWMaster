@@ -338,3 +338,174 @@ body:has(.quarter-intro){background:#fff}
 #app .week .event-deadline .event-title{font-size:10px;line-height:1.4}
 #app .week .event-deadline .event-kind{display:none}
 @media(max-width:760px){#app .month .day-markers{left:6px;bottom:6px;grid-template-columns:repeat(var(--marker-columns),6px);grid-auto-rows:6px;gap:4px}}
+
+/* Task rows open details; source titles and checkboxes remain independent. */
+#app .task{cursor:pointer}
+#app .task:focus-visible{outline:2px solid var(--course-accent);outline-offset:2px}
+#app .task .task-title{cursor:pointer}
+
+/* Completed work remains reachable beside the pending agenda. */
+#app .completion-tools{display:flex;justify-content:flex-end;margin:0 0 12px}
+#app .completion-tools button,#app .completion-notice button{font-size:12px;min-height:36px;padding:5px 10px}
+#app .completion-notice{display:flex;align-items:center;flex-wrap:wrap;gap:8px;background:#f3f0f8;border-left:3px solid var(--p);padding:10px 12px;margin:0 0 14px;font-size:12px;overflow-wrap:anywhere}
+#app .completion-notice.save-error{background:#fff3ed;border-color:#a34926}
+#app .completion-notice{position:sticky;top:0;z-index:2}
+#app .completed-section{border-top:1px solid var(--line);margin-top:20px;padding-top:14px}
+#app .completed-section>summary{cursor:pointer;min-height:44px;line-height:44px;font-weight:700;color:var(--p)}
+#app .completed-section>summary span{font-size:12px;font-weight:400;color:var(--muted);margin-left:10px}
+#app .completed-context{color:var(--muted);font-size:11px;margin:8px 0 12px}
+#app .completed-section .task-title b{text-decoration:line-through}
+#app .day-marker.done{opacity:.35;outline:1px solid var(--muted);outline-offset:1px}
+
+/* Status saves preserve explicit scroll offsets rather than browser anchoring. */
+html,#app .todo-panel{overflow-anchor:none}
+.task-heading-title{display:flex;align-items:baseline;gap:12px;min-width:0;white-space:nowrap}
+#app .task-heading-title>span{font-size:10px;color:var(--quiet);background:transparent;padding:0;white-space:nowrap}
+.task-heading-actions{display:flex;align-items:center;gap:0;margin-left:auto;white-space:nowrap}
+#app .task-heading-actions button{border:0;background:transparent;color:var(--p);padding:0 10px;min-height:30px;font-size:12px}
+#app .task-heading-actions button:hover{background:#f3f0f8}
+#app .task-heading-actions .add-task-button{font-size:22px;line-height:1;width:32px;padding:0;border-left:1px solid var(--line)}
+#addTask{padding:28px}#addTask input,#addTask select,#addTask textarea{display:block;width:100%;font:inherit;font-size:14px;padding:10px;border:1px solid var(--line);border-radius:0;background:#fff;color:var(--ink)}
+#addTaskForm{display:block;border:0;margin:0;padding:0;position:static}
+#addTask label{display:block;font-size:13px;font-weight:600;margin:16px 0 8px}
+.task-form-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}.task-form-pair>div{min-width:0}
+.task-dialog-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:22px}.task-dialog-actions button{min-height:40px}
+.delete-task-button{display:block;margin-top:24px;color:#a3312c;border-color:#e6c7c5;font-size:12px}
+.task-delete-notice{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:10;display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);box-shadow:0 6px 28px #0002;padding:12px 18px;font-size:13px;max-width:calc(100vw - 32px)}
+@media(max-width:760px){.task-heading-title{gap:8px}#app .task-heading-title>span{font-size:9px}#app .panel-heading h3{white-space:nowrap}#addTask{padding:20px}}
+
+/* Keep browser scrollbar allocation and desktop agenda geometry stable. */
+html{scrollbar-gutter:stable}
+#app .todo-panel{min-height:min(600px,78vh)}
+#app details{overflow-anchor:none}
+#app .completed-body{display:flow-root}
+dialog[open]{animation:dialog-enter 180ms ease-out}
+@keyframes dialog-enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:760px){#app .todo-panel{min-height:0}}
+@media(prefers-reduced-motion:reduce){dialog[open]{animation:none}}
+
+/* Shared two-page navigation, with a quiet active underline. */
+.utility-bar .utility-inner{flex-direction:row;align-items:center;justify-content:space-between;min-height:62px;padding-top:0;padding-bottom:0}
+.page-tabs{display:flex;align-self:stretch;align-items:stretch;gap:36px;margin-left:auto}
+.page-tabs a{position:relative;display:flex;align-items:center;padding:0 2px;text-decoration:none;font-family:var(--display);font-size:17px;font-weight:600;color:#817b88}
+.page-tabs a:hover{color:var(--p)}
+.page-tabs a[aria-current=page]{color:var(--p);font-weight:700}
+.page-tabs a[aria-current=page]:after{content:'';height:3px;background:var(--p);position:absolute;bottom:0;left:0;right:0}
+.page-tabs a:focus-visible{outline:2px solid var(--p);outline-offset:4px}
+@media(max-width:760px){.utility-bar .utility-inner{min-height:56px;gap:16px}.page-tabs{gap:20px}.page-tabs a{font-size:14px;white-space:nowrap}}
+
+/* Detail pass: common baselines, restrained controls, and persistent agenda heading. */
+:root{--detail-line:#e4e0e8;--detail-muted:#746e7c;--detail-focus:#4b2e83}
+.page-tabs{gap:32px}
+.page-tabs a{font-size:16px;letter-spacing:.01em;transition:color 140ms ease}
+.page-tabs a[aria-current=page]:after{height:2px;bottom:8px}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,textarea:focus-visible{outline:2px solid var(--detail-focus);outline-offset:3px}
+#app{--text:#26222d;--secondary:#706a77;--hairline:var(--detail-line);gap:30px 28px}
+#app .quarter-intro{padding-top:28px;padding-bottom:24px}
+#app .hero{margin-bottom:22px}
+#app .hero h2{margin-bottom:10px;line-height:1.3}
+#app .section-caption{letter-spacing:.12em;margin-bottom:9px}
+#app .quarter-stats{gap:34px;align-items:center;padding-right:0}
+#app .quarter-stats>div{gap:6px;min-width:66px}
+#app .quarter-stats span{letter-spacing:.12em}
+#app .warning-summary{margin-bottom:12px}
+#app .notice summary{line-height:1.7;cursor:pointer}
+#app .filters input,#app .filters select{border-radius:0;border-color:#ded9e3;font-size:12px}
+#app .filters input::placeholder{color:#8c8692}
+#app .filters input:hover,#app .filters select:hover{border-color:#bfb5ce}
+#app .course-legend{gap:14px}
+#app .sidebar{padding:20px 0 24px}
+#app .sidebar h2{font-size:20px;line-height:1.4;min-height:44px;margin:0 0 12px;padding:0 0 14px;font-weight:600}
+#app .sidebar button{padding:11px 12px;transition:background-color 140ms ease,color 140ms ease}
+#app .sidebar .course-group{padding-top:9px;margin-top:9px}
+#app .sidebar small{line-height:1.6;margin-top:4px}
+#app .panel-heading{height:44px;min-height:44px;padding-bottom:12px;margin-bottom:12px}
+#app .panel-heading h3{font-size:20px;line-height:1.4;font-weight:600}
+#app .todo-panel .panel-heading{position:sticky;top:0;z-index:4;background:#fff;border-bottom-color:#c8b98f;margin-top:0}
+#app .task-heading-title{gap:10px}
+#app .task-heading-actions button{min-height:30px;padding:0 9px;font-size:11px}
+#app .task-heading-actions .add-task-button{width:30px;font-size:20px;padding:0}
+#app .task{margin-top:6px;margin-bottom:6px;padding:12px 10px;transition:background-color 140ms ease}
+#app .task input{align-self:start;margin-top:3px;border-radius:0}
+#app .task b{line-height:1.5}
+#app .task small{font-size:10px;line-height:1.65;gap:3px 5px}
+#app .task .source-status{border:0;padding:0;background:transparent;color:var(--secondary)}
+#app .task time{padding-top:0;letter-spacing:0;font-variant-numeric:tabular-nums}
+#app .task time strong{font-size:14px;line-height:1.6}
+#app .task .source-arrow{font-size:10px;opacity:.65}
+#app .calendar-toolbar{margin-bottom:12px}
+#app .calendar-toolbar>span{gap:5px}
+#app .calendar-toolbar>b{font-size:13px;letter-spacing:0}
+#app .calendar-grid>b{font-size:10px;color:var(--secondary)}
+#app .event-title{overflow-wrap:normal;word-break:normal;hyphens:auto}
+#app .event:focus-visible{outline-offset:1px}
+#app .date-popover{border-color:#dcd6e4;padding:14px}
+#app .date-popover header strong{font-size:13px}
+#app .popover-tasks{scrollbar-width:thin;scrollbar-color:#dcd6e4 transparent}
+#app .calendar-context{font-size:10px;color:#817b88;line-height:1.7;margin-top:12px}
+#app .completed-section>summary{font-size:13px}
+#app .completed-section>summary span{font-size:10px}
+.site-footer{border-top-color:var(--detail-line);font-size:10px;color:var(--detail-muted)}
+#detail .detail-date{border-left:2px solid var(--g)}
+#detail textarea,#addTask input,#addTask select,#addTask textarea{border-color:#ded9e3}
+#retrieval .retrieval-heading{border-bottom-width:2px}
+#retrieval .retrieval-heading h1{letter-spacing:-.02em;line-height:1.35}
+#retrieval .retrieval-layout h2{font-size:20px;font-weight:600}
+#retrieval .retrieval-editor textarea{border-color:#ded9e3;font-size:13px;line-height:1.8}
+#retrieval .update-section{border-top-width:1px;border-top-color:var(--detail-line)}
+body:has(#retrieval) .assistant-toggle,body:has(#retrieval) .assistant-panel{box-shadow:none}
+@media(max-width:1200px) and (min-width:761px){#app .quarter-intro{padding-top:26px}#app .sidebar h2{font-size:19px}}
+@media(max-width:760px){
+ .page-tabs{gap:20px}.page-tabs a{font-size:14px}.page-tabs a[aria-current=page]:after{bottom:6px}
+ #app{gap:24px}
+ #app .quarter-intro{padding-top:22px;padding-bottom:20px}
+ #app .hero h2{font-size:27px}
+ #app .quarter-stats{gap:16px}#app .quarter-stats>div{min-width:42px}
+ #app .filters input,#app .filters select{font-size:12px}
+ #app .sidebar{padding:4px 0}
+ #app .sidebar button{padding:8px 10px}
+ #app .panel-heading h3{font-size:19px}
+ #app .todo-panel .panel-heading{position:static}
+ #app .task{padding:11px 8px}
+ #app .task b{font-size:13px}
+ #app .calendar-toolbar>b{font-size:12px}
+ #retrieval .retrieval-editor textarea{font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){#app .task,#app .sidebar button,.page-tabs a{transition:none}}
+
+@media(max-width:760px){
+ #app .sidebar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;align-items:stretch}
+ #app .sidebar>[data-course]{grid-column:auto}
+ #app .sidebar .course-group{display:contents}
+ #app .sidebar button,#app .sidebar .course-group>button{width:100%;padding:8px 4px;min-height:36px;font-size:10.5px;white-space:nowrap}
+ #app .sidebar b{font-size:10.5px}
+}
+
+/* Match the retrieval page to the same white workspace and content rail. */
+body:has(#retrieval){background:#fff}
+body #retrieval{max-width:1600px;padding:36px 42px 60px}
+#retrieval .retrieval-layout{gap:32px}
+#retrieval .retrieval-heading>p:first-child{font-size:10px;letter-spacing:.12em;color:var(--p)}
+#retrieval select{max-width:100%;min-width:0;text-overflow:ellipsis}
+@media(max-width:760px){body #retrieval{padding:28px 18px 48px}#retrieval .retrieval-layout{gap:24px}#retrieval #connectionSource{width:100%;max-width:100%;min-width:0}}
+
+@media(max-width:360px){#app .sidebar{grid-template-columns:repeat(4,minmax(0,1fr))}#app .sidebar>[data-course]{grid-column:1/-1}}
+
+/* Heavy, square Chinese display lettering; body copy retains its existing face. */
+@font-face{font-family:"UW Title SC";src:local("Noto Sans SC"),local("NotoSansSC-Thin");font-style:normal;font-weight:100 900;font-display:swap}
+#app{--title-face:"UW Title SC","Noto Sans SC","Microsoft YaHei",sans-serif}
+#app .hero h2{font-family:var(--title-face);font-weight:900;font-size:48px;line-height:1.28;letter-spacing:-.015em}
+#app .quarter-stats strong{font-size:56px}
+#app .sidebar h2,#app .panel-heading h3{font-family:var(--title-face);font-weight:750;font-size:20px;line-height:1.4;letter-spacing:0}
+@media(max-width:760px){#app .hero h2{font-size:34px}#app .quarter-stats strong{font-size:38px}#app .panel-heading h3{font-size:19px}}
+
+/* Keep the heading outside the scrolling task sheet. */
+#app .todo-panel{overflow:visible;max-height:none}
+#app .todo-panel .panel-heading{position:static}
+#app .todo-scroll{max-height:calc(78vh - 76px);overflow-y:auto;overflow-x:hidden;scrollbar-width:none;overflow-anchor:none}
+#app .todo-scroll::-webkit-scrollbar{display:none}
+#app .todo-scroll .review-banner{margin:0 0 8px;padding:12px 14px;font-size:12px;line-height:1.65;background:#fff8f2}
+#app .todo-scroll .review-banner p{margin:5px 0 8px;color:var(--secondary)}
+#app .todo-scroll .review-banner button{display:block;margin:4px 0;padding:5px 0;border:0;background:transparent;text-align:left;font-size:12px}
+@media(min-width:761px) and (max-width:1200px){#app .todo-scroll{max-height:464px}}
+@media(max-width:760px){#app .todo-scroll{max-height:none;overflow:visible}}

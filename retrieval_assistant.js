@@ -91,7 +91,7 @@
     const saveState=state;state=async function(...args){stateWrites++;try{return await saveState(...args)}finally{stateWrites--}};
     const panelRender=render,taskList=list;
     list=function(){return taskList().filter(t=>!['cancelled','excluded'].includes(t.lifecycle))};
-    render=function(){panelRender();const reviews=S.tasks.filter(t=>t.needs_review && !['cancelled','excluded'].includes(t.lifecycle) && (course==='all'||t.course_id===course));if(!reviews.length)return;const banner=document.createElement('div');banner.className='review-banner';banner.innerHTML='<strong>需要复核 · '+reviews.length+' 项</strong><p>完成记录保留。请查看检索助手中的来源冲突或新增要求。</p>'+reviews.map(t=>'<button data-review-task="'+escape(t.id)+'">'+escape(t.title)+'</button>').join('');document.querySelector('.workspace')?.prepend(banner);banner.querySelectorAll('[data-review-task]').forEach(b=>b.onclick=()=>detail(b.dataset.reviewTask));};
+    render=function(){panelRender();const reviews=S.tasks.filter(t=>t.needs_review && !['cancelled','excluded'].includes(t.lifecycle) && (course==='all'||t.course_id===course));if(!reviews.length)return;const banner=document.createElement('div');banner.className='review-banner';banner.innerHTML='<strong>需要复核 · '+reviews.length+' 项</strong><p>完成记录保留。请查看检索助手中的来源冲突或新增要求。</p>'+reviews.map(t=>'<button data-review-task="'+escape(t.id)+'">'+escape(t.title)+'</button>').join('');document.querySelector('.todo-scroll')?.prepend(banner);banner.querySelectorAll('[data-review-task]').forEach(b=>b.onclick=()=>detail(b.dataset.reviewTask));};
   }
   poll();
 })();

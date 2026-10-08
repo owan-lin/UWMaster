@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $log = Join-Path $root 'data\server.log'
 $errorLog = Join-Path $root 'data\server-error.log'

@@ -11,6 +11,7 @@ import shutil
 import sys
 import tempfile
 import threading
+import uuid
 import beta
 import retrieval_flow
 from types import SimpleNamespace
@@ -95,6 +96,45 @@ def source_snapshot():
     return read_json(SNAPSHOT, None)
 
 
+def task_snapshot():
+    snap = source_snapshot()
+    if not snap: return None
+    local = read_json(DATA / "manual_tasks.json", {}).get("terms", {}).get(snap["term"]["id"], {})
+    snap = copy.deepcopy(snap)
+    tasks = {t["id"]: t for t in snap.get("tasks", [])}
+    tasks.update(local.get("tasks", {}))
+    snap["tasks"] = [t for tid, t in tasks.items() if tid not in local.get("deleted", {})]
+    return snap
+
+
+def change_local_task(body):
+    snap = source_snapshot()
+    if not snap: raise ValueError("当前没有课程快照")
+    store = read_json(DATA / "manual_tasks.json", {"terms": {}})
+    local = store.setdefault("terms", {}).setdefault(snap["term"]["id"], {"tasks": {}, "deleted": {}})
+    action = body.get("action")
+    if action == "add":
+        title, course = body.get("title"), body.get("course_id")
+        if not isinstance(title, str) or not title.strip() or len(title.strip()) > 160: raise ValueError("请填写不超过 160 字符的任务标题")
+        if course not in {c["id"] for c in snap["courses"]}: raise ValueError("请选择当前课程")
+        kind = body.get("kind", "homework")
+        if kind not in {"homework", "project", "quiz", "exam", "participation", "preparation", "class", "extra_credit"}: raise ValueError("任务分类无效")
+        due, description, source = body.get("due") or None, body.get("description", ""), body.get("source_url", "")
+        if due is not None and (not isinstance(due, str) or parse_date(due) is None or len(due) > 10 and parse_date(due).tzinfo is None): raise ValueError("截止时间需为日期或带时区的时间")
+        if not isinstance(description, str) or len(description) > 12000: raise ValueError("任务详情最多 12000 字符")
+        if not isinstance(source, str) or len(source) > 2000 or source and (urlparse(source).scheme not in {"https", "http"} or not urlparse(source).hostname): raise ValueError("来源链接无效")
+        tid = "manual-" + uuid.uuid4().hex
+        task = {"id": tid, "course_id": course, "title": title.strip(), "kind": kind, "due": due, "description": description, "source_url": source, "certainty": "verified" if due else "needs_confirmation", "manual": True, "source_note": "手动添加", "created_at": iso_now()}
+        local["tasks"][tid] = task
+    elif action in {"delete", "restore"}:
+        tid = body.get("id")
+        if tid not in {t["id"] for t in snap["tasks"]} | local["tasks"].keys(): raise ValueError("任务不存在")
+        if action == "delete": local["deleted"][tid] = {"at": iso_now()}
+        else: local["deleted"].pop(tid, None)
+    else: raise ValueError("任务操作无效")
+    atomic_write(DATA / "manual_tasks.json", store)
+    return {"ok": True, "id": tid}
+
 def merge_snapshot(old, incoming):
     """Never erase a prior task merely because a single source run omitted it."""
     if not old or old.get("term", {}).get("id") != incoming.get("term", {}).get("id"): return incoming
@@ -147,7 +187,7 @@ def changes_between(old, new):
 
 
 def merged_snapshot():
-    snap = source_snapshot()
+    snap = task_snapshot()
     if not snap: return None
     snap = copy.deepcopy(snap)
     states = read_json(STATE, {"tasks": {}}).get("tasks", {})
@@ -218,6 +258,9 @@ class App(SimpleHTTPRequestHandler):
     def do_POST(self):
         try:
             body = self.read_body()
+            if self.path == "/api/tasks":
+                with LOCK: result = change_local_task(body)
+                return self.send_json(200, result)
             if self.path.startswith("/api/retrieval/"):
                 module = SimpleNamespace(**globals())
                 if self.path == "/api/retrieval/connect":
@@ -251,7 +294,7 @@ class App(SimpleHTTPRequestHandler):
             if self.path == "/api/task-state":
                 tid = body.get("id"); completed = body.get("completed"); note = body.get("note", "")
                 if not isinstance(tid, str) or not isinstance(completed, bool) or not isinstance(note, str) or len(note) > 4000: raise ValueError("任务状态字段无效")
-                snap = source_snapshot()
+                snap = task_snapshot()
                 if not snap or tid not in {t.get("id") for t in snap.get("tasks", [])}: raise ValueError("任务不存在于当前快照")
                 with LOCK:
                     state = read_json(STATE, {"tasks": {}}); state.setdefault("tasks", {})[tid] = {"completed": completed, "note": note, "updated_at": iso_now()}
