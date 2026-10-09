@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 import beta
 import course_collector
 import local_codex
-from retrieval_merge import reconcile, FIELDS
+from retrieval_merge import reconcile, FIELDS, normalized
 
 LOCK = threading.RLock()
 ACTIVE = set()
@@ -57,12 +57,28 @@ def read(server, token):
             job["chat_busy"] = False
             job["messages"].append({"role": "assistant", "content": "上次 AI 对话因服务重启中断，请重新发送。"})
             save(server, job)
+        if job['status'] == 'finished' and job.get('report'):
+            prior = previous_issues(server, job.get('base', {}).get('term', {}).get('id'))
+            carried = 0
+            for kind in ('conflicts', 'notices'):
+                for issue in job['report'].get(kind, []):
+                    previous = prior[kind].get(issue_key(kind, issue, job))
+                    if not issue.get('resolved') and previous and previous.get('resolved'):
+                        issue.update({k: previous[k] for k in ('resolved', 'resolution', 'resolved_at') if k in previous})
+                        issue['resolution_carried'] = True
+                        carried += 1
+            if carried:
+                remaining = sum(not i.get('resolved') for kind in ('conflicts', 'notices') for i in job['report'].get(kind, []))
+                job['message'] = f"已应用 {len(job['report'].get('changes', []))} 项任务变更；{remaining} 项待处理。{carried} 项相同证据的提醒沿用此前处理结果。来源读取情况见核查详情。"
         return job
 
 
 def public_job(job):
     result = {k: copy.deepcopy(v) for k, v in job.items() if k not in {"base", "request", "pending", "candidate"}}
     result["sources"] = [{k: v for k, v in source.items() if k not in {"text", "links"}} for source in result.get("sources", [])]
+    result['task_titles'] = {t['id']: t['title'] for t in job.get('base', {}).get('tasks', [])}
+    for change in (job.get('report') or {}).get('changes', []):
+        result['task_titles'][change['task_id']] = change['title']
     return result
 
 
@@ -80,6 +96,20 @@ def recent(server):
             for j in (read(server, row[0]) for row in rows)]
 
 
+def issue_key(kind, issue, job):
+    """A decision follows evidence and course rules, rather than an AI paraphrase."""
+    task = next((t for t in job.get('base', {}).get('tasks', []) if t['id'] == issue.get('task_id')), {})
+    facts = {k: task.get(k) for k in ('due', 'end', 'kind', 'points', 'weight', 'lifecycle', 'time_basis', 'platform_due_label')}
+    rules = job.get('request', {})
+    context = [rules.get('project_rules'), rules.get('common_rules'),
+               sorted((c['course_id'], c.get('requirements')) for c in rules.get('courses', []) if c['course_id'] == task.get('course_id'))]
+    offers = sorted((json.dumps(o.get('value'), sort_keys=True, ensure_ascii=False), o.get('source_url'), normalized(o.get('evidence', ''))) for o in issue.get('offers', []))
+    proof = [issue.get('source_url'), normalized(issue.get('evidence', '')), offers, issue.get('current')]
+    # Messages without quoted evidence must retain their original identity.
+    identity = proof if issue.get('evidence') or offers else issue['id']
+    return beta.digest([kind, issue.get('task_id'), issue.get('field'), identity, facts, context])
+
+
 def previous_issues(server, term_id):
     with database(server) as db:
         rows = db.execute("SELECT payload FROM jobs ORDER BY updated").fetchall()
@@ -88,7 +118,11 @@ def previous_issues(server, term_id):
         previous = json.loads(raw)
         if previous.get("base", {}).get("term", {}).get("id") != term_id: continue
         for kind in issues:
-            for issue in (previous.get("report") or {}).get(kind, []): issues[kind][issue["id"]] = issue
+            for issue in (previous.get("report") or {}).get(kind, []):
+                key = issue_key(kind, issue, previous)
+                # A repeated unresolved paraphrase does not undo a user's decision.
+                if key not in issues[kind] or issue.get('resolved'):
+                    issues[kind][key] = issue
     return issues
 
 
@@ -231,6 +265,11 @@ def run(server, token, urls):
         update(server, token, stage="analyzing", message="本地 Codex 正在整理任务并检查规则冲突。")
         payload = {"request": job["request"], "cutoff": job["started_at"], "evidence": job["sources"],
                    "instructions": "返回增量 observations。新增仅限截止不早于 cutoff 的任务或已发布但截止未知的任务；已有任务按原 ID 复核，即使已逾期。每个 observation evidence 必须引用本次来源原文至少 8 字符。fields 仅填有证据的字段，value_json 是字段值的 JSON 编码。明确清空才 explicit_clear=true。新增 task_id=null，source_key 使用稳定平台任务 ID 或规范的独立任务 URL；现有任务用 current_snapshot 中 ID。新增包括 title/kind/due，未知 due 用 null。跨来源冲突需分别给出 observations；与课程检索要求或 project_rules 矛盾须填 blockers。不要输出个人完成状态或备注，不将浏览触发的局部阅读完成当整项完成。"}
+        payload['instructions'] += ' 只输出有本次证据的新事实或实际矛盾，不为无法登录、未知分值、未发布、逾期但提交情况未知生成 blockers；这些按来源覆盖或 warnings 汇总即可。同一事项的简称或编号不同但身份明确，不视为规则冲突；保留 ID 与现有简短标题。相同字段仅排版或等价时区表示不同不是冲突。引用必须从 evidence 原文复制，不能引用 current_snapshot 的旧证据；无本次证据的旧任务保持不变，不输出 observation。每个真实问题只写一个具体 blocker；warnings 不重复逐任务或逐网址列出通用规则、输出格式和登录失败。'
+        prior = previous_issues(server, job['base']['term']['id'])
+        selected_tasks = {t['id'] for t in job['base']['tasks'] if t['course_id'] in job['course_ids']}
+        payload['previously_reviewed'] = [issue for kind in prior.values() for issue in kind.values() if issue.get('resolved') and issue.get('task_id') in selected_tasks]
+        payload['instructions'] += ' previously_reviewed 是用户此前处理记录，仅在相同原文证据、任务事实及课程规则仍一致时沿用；出现新截止、新要求或新矛盾必须重新报告，不将此前处理当作永久忽略某来源。'
         result = local_codex.run(server.ROOT, payload, SCHEMA, lambda: cancelled(server, token))
         if not isinstance(result, dict) or not isinstance(result.get("observations"), list) or len(result["observations"]) > 1000:
             raise ValueError("AI 返回结果格式无效或任务数量超过限制。")
@@ -246,10 +285,10 @@ def run(server, token, urls):
             prior = previous_issues(server, candidate["term"]["id"])
             task_ids = {t["id"] for t in candidate["tasks"]}
             for kind in ("conflicts", "notices"):
-                current_issues = {issue["id"]: issue for issue in report[kind]}
+                current_issues = {issue_key(kind, issue, job): issue for issue in report[kind]}
                 for key, issue in prior[kind].items():
                     if key in current_issues and issue.get("resolved"):
-                        current_issues[key] = copy.deepcopy(issue)
+                        current_issues[key].update({k: issue[k] for k in ('resolved', 'resolution', 'resolved_at') if k in issue})
                     elif key not in current_issues and not issue.get("resolved") and issue.get("task_id") in task_ids:
                         current_issues[key] = copy.deepcopy(issue)
                 report[kind] = list(current_issues.values())

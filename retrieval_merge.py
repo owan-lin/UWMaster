@@ -22,6 +22,16 @@ def normalized(value):
     return re.sub(r"\s+", " ", str(value)).strip().casefold()
 
 
+def field_key(name, value):
+    if name in {'due', 'end', 'available_from'} and isinstance(value, str) and len(value) > 10:
+        return dt.datetime.fromisoformat(value.replace('Z', '+00:00')).astimezone(dt.timezone.utc).isoformat()
+    if name in {'description', 'title', 'original_title'} and isinstance(value, str):
+        if name == 'description' and '```' in value:
+            return value.replace('\r\n', '\n').strip()
+        return re.sub(r'\s+', ' ', value).strip()
+    return json.dumps(value, sort_keys=True, ensure_ascii=False)
+
+
 def valid_field(name, value):
     if name not in FIELDS:
         return False
@@ -132,11 +142,13 @@ def reconcile(base, current, result, evidence, selected, cutoff, states=None):
         before = copy.deepcopy(tasks.get(tid))
         task = copy.deepcopy(before) if before else {"id": tid, "course_id": proposal["course_id"], "source_url": proposal["source_url"], "source_key": proposal["source_key"]}
         for name, offers in proposal["fields"].items():
-            distinct = {json.dumps(o["value"], sort_keys=True, ensure_ascii=False) for o in offers}
+            distinct = {field_key(name, o['value']) for o in offers}
             if len(distinct) > 1:
                 issue("conflicts", tid, name, "本次来源对同一字段给出不同值，保留原值。", current=(before or {}).get(name), original_certainty=(before or {}).get("certainty"), offers=offers)
                 continue
             value = offers[0]["value"]
+            if before and field_key(name, before.get(name)) == field_key(name, value):
+                continue
             # New fact differs from both baseline and a concurrently updated field.
             if before and before.get(name) != old.get(tid, {}).get(name) and before.get(name) != value:
                 issue("conflicts", tid, name, "检索期间此字段已被其他更新修改，保留当前值。", current=before.get(name), original_certainty=before.get("certainty"), offers=offers)
