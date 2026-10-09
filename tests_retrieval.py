@@ -86,6 +86,7 @@ with tempfile.TemporaryDirectory(prefix="retrieval-test-", dir="work") as direct
     snapshot.write_text(json.dumps(BASE), encoding="utf-8")
     state.write_text(json.dumps({"tasks": {"a": {"completed": True, "note": "private note"}}}), encoding="utf-8")
     (root / "TASK_RULES.md").write_text("Respect user requirements", encoding="utf-8")
+    (root / "RETRIEVAL_WORKFLOW_PLAN.md").write_text("Overall retrieval instructions", encoding="utf-8")
     fake = SimpleNamespace(ROOT=root, DATA=data, SNAPSHOT=snapshot, STATE=state, HISTORY=data / "history.json", LOCK=threading.RLock(),
                            read_json=server.read_json, iso_now=server.iso_now, validate_snapshot=server.validate_snapshot)
     fake.source_snapshot = lambda: server.read_json(snapshot, None)

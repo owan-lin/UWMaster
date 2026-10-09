@@ -236,7 +236,8 @@ class App(SimpleHTTPRequestHandler):
             except ValueError as e: return self.send_json(404, {"error": str(e)})
         if self.path == "/api/retrieval/settings":
             if not self.allowed(): return self.send_json(403, {"error": "请求来源未获允许"})
-            return self.send_json(200, beta.load_settings(SimpleNamespace(**globals())))
+            try: return self.send_json(200, beta.load_settings(SimpleNamespace(**globals())))
+            except ValueError as e: return self.send_json(400, {'error': str(e)})
         if self.path == "/api/data":
             snap = merged_snapshot()
             if not snap: return self.send_json(404, {"error": "还没有 snapshot.json。请放入符合 schema v1 的快照后刷新。"})

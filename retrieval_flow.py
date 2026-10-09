@@ -101,7 +101,7 @@ def issue_key(kind, issue, job):
     task = next((t for t in job.get('base', {}).get('tasks', []) if t['id'] == issue.get('task_id')), {})
     facts = {k: task.get(k) for k in ('due', 'end', 'kind', 'points', 'weight', 'lifecycle', 'time_basis', 'platform_due_label')}
     rules = job.get('request', {})
-    context = [rules.get('project_rules'), rules.get('common_rules'),
+    context = [rules.get('overall_plan_version'), rules.get('instruction_policy'), rules.get('project_rules'), rules.get('common_rules'),
                sorted((c['course_id'], c.get('requirements')) for c in rules.get('courses', []) if c['course_id'] == task.get('course_id'))]
     offers = sorted((json.dumps(o.get('value'), sort_keys=True, ensure_ascii=False), o.get('source_url'), normalized(o.get('evidence', ''))) for o in issue.get('offers', []))
     proof = [issue.get('source_url'), normalized(issue.get('evidence', '')), offers, issue.get('current')]
@@ -180,6 +180,9 @@ def start(server, course_id):
                "request": bundle, "base": copy.deepcopy(bundle["current_snapshot"]), "rules_digest": beta.digest(bundle),
                "messages": [], "report": None, "cancel_requested": False, "message": "正在采集课程来源。"}
         job["source_courses"] = source_courses
+        job['instruction_versions'] = {'overall_plan_file': bundle['overall_plan_file'], 'overall_plan_version': bundle['overall_plan_version'],
+            'project_rules_version': beta.digest(bundle['project_rules']),
+            'course_requirements_version': beta.digest(bundle['courses'])}
         ACTIVE.add(token)
         save(server, job)
     threading.Thread(target=run, args=(server, token, urls), daemon=True).start()
@@ -278,7 +281,7 @@ def run(server, token, urls):
             job = read(server, token)
             if job.get("cancel_requested"): raise ValueError("检索已取消。")
             fresh = beta.request_bundle(server, job["request"]["courses"][0]["course_id"] if len(job["course_ids"]) == 1 else "all")
-            rules_changed = any(job["request"].get(k) != fresh.get(k) for k in ("courses", "common_rules", "project_rules"))
+            rules_changed = any(job["request"].get(k) != fresh.get(k) for k in ("courses", "common_rules", "project_rules", "overall_plan_version", "instruction_policy"))
             if rules_changed: raise ValueError("检索期间要求或课程规则已修改，本次未应用，请按新要求重新检索。")
             candidate, report = reconcile(job["base"], server.source_snapshot(), result, job["sources"], set(job["course_ids"]),
                                           dt.datetime.fromisoformat(job["started_at"]), server.read_json(server.STATE, {"tasks": {}}).get("tasks", {}))
