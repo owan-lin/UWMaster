@@ -221,9 +221,6 @@ class App(SimpleHTTPRequestHandler):
         if length <= 0 or length > MAX_BODY: raise ValueError("请求体为空或超过 2 MB 限制")
         return json.loads(self.rfile.read(length).decode("utf-8"))
     def do_GET(self):
-        if self.path == '/api/retrieval/gmail':
-            if not self.allowed(): return self.send_json(403, {'error': '请求来源未获允许'})
-            return self.send_json(200, retrieval_flow.gmail_collector.status(SimpleNamespace(**globals())))
         if self.path.startswith("/api/retrieval/runs/") or self.path in ("/api/retrieval/latest", "/api/retrieval/connections", "/api/retrieval/recent"):
             if not self.allowed(): return self.send_json(403, {"error": "请求来源未获允许"})
             module = SimpleNamespace(**globals())
@@ -250,7 +247,7 @@ class App(SimpleHTTPRequestHandler):
             raw = build_ics(merged_snapshot() or {}).encode("utf-8")
             self.send_response(200); self.send_header("Content-Type", "text/calendar; charset=utf-8"); self.send_header("Content-Disposition", "attachment; filename=uw-uncompleted.ics"); self.send_header("Content-Length", str(len(raw))); self.end_headers(); return self.wfile.write(raw)
         if self.path.startswith("/api/"): return self.send_json(404, {"error": "未知 API"})
-        static_files = ("/", "/index.html", "/app.js", "/style.css", "/retrieval.html", "/retrieval.js", "/retrieval.css", "/retrieval_assistant.js", "/retrieval_assistant.css", "/gmail.html", "/gmail.js",
+        static_files = ("/", "/index.html", "/app.js", "/style.css", "/retrieval.html", "/retrieval.js", "/retrieval.css", "/retrieval_assistant.js", "/retrieval_assistant.css",
                         "/assets/uw-logo.svg", "/assets/uw-campus.jpg", "/assets/fonts.css",
                         "/assets/font-1.ttf", "/assets/font-2.ttf",
                         "/assets/font-3.ttf", "/assets/font-4.ttf",
@@ -266,12 +263,6 @@ class App(SimpleHTTPRequestHandler):
                 return self.send_json(200, result)
             if self.path.startswith("/api/retrieval/"):
                 module = SimpleNamespace(**globals())
-                if self.path == '/api/retrieval/gmail/settings':
-                    return self.send_json(200, retrieval_flow.gmail_collector.configure(module, body))
-                if self.path == '/api/retrieval/gmail/connect':
-                    return self.send_json(202, retrieval_flow.gmail_collector.connect(module))
-                if self.path == '/api/retrieval/gmail/disconnect':
-                    return self.send_json(200, retrieval_flow.gmail_collector.disconnect(module))
                 if self.path == "/api/retrieval/connect":
                     settings = beta.load_settings(module)
                     if body.get("url") not in {u for c in settings["courses"] for u in c["sources"]}: raise ValueError("请使用已保存的课程来源连接浏览器。")
