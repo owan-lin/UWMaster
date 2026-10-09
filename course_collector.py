@@ -1,7 +1,8 @@
-"""Local, persistent browser session. Login is performed by the user, never by AI."""
+"""Persistent browser session; credentials stay in the browser's login form."""
 import concurrent.futures
 import io
 import queue
+import re
 import sys
 import threading
 from pathlib import Path
@@ -11,6 +12,66 @@ import beta
 
 RUNTIME = Path(__file__).resolve().parent / "work/runtime-packages"
 if RUNTIME.is_dir(): sys.path.insert(0, str(RUNTIME))
+
+UW_LOGIN_HOSTS = {'canvas.uw.edu', 'idp.u.washington.edu', 'weblogin.washington.edu'}
+
+
+def needs_login(page):
+    host = urlparse(page.url).hostname or ''
+    return (any(word in page.url.lower() for word in ('/login', '/signin', '/saml', '/sso'))
+            or host in UW_LOGIN_HOSTS - {'canvas.uw.edu'}
+            or host in {'login.microsoftonline.com', 'login.live.com', 'accounts.google.com'}
+            or host.endswith('.duosecurity.com')
+            or bool(page.locator('input[type="password"]').count()))
+
+
+def submit_prefilled_login(page, attempted):
+    """Submit one already-filled UW login form, without returning credentials.
+
+    Keep unsuccessful pages in attempted so later sources cannot repeatedly
+    submit a bad password. MFA and consent pages are left for the user.
+    """
+    if page in attempted or urlparse(page.url).hostname not in UW_LOGIN_HOSTS:
+        return
+    try:
+        passwords = page.locator('input[type="password"]:visible')
+        if passwords.count() != 1:
+            return
+        password = passwords.first
+        if not password.evaluate('element => Boolean(element.value)'):
+            return
+        form = password.locator('xpath=ancestor::form[1]')
+        usernames = form.locator('input[autocomplete="username"], input[type="email"], input[name="user"], input[name="username"], input[name="j_username"], input[id="weblogin_netid"]')
+        if not usernames.evaluate_all('nodes => nodes.some(n => Boolean(n.value))'):
+            return
+        # Do not submit forms that also ask for a verification code.
+        if form.locator('input[autocomplete="one-time-code"], input[name="otp"], input[name="passcode"]').count():
+            return
+        buttons = form.locator('button[type="submit"], input[type="submit"], button:not([type])')
+        candidates = []
+        for index in range(buttons.count()):
+            button = buttons.nth(index)
+            label = button.get_attribute('value') or button.inner_text()
+            if (re.fullmatch(r'\s*(sign\s*in|log\s*in|login|登录)\s*', label, re.I)
+                    and button.is_visible() and button.is_enabled()):
+                candidates.append(button)
+        if len(candidates) != 1:
+            return
+        attempted.add(page)
+        candidates[0].click(timeout=3000, no_wait_after=True)
+        for _ in range(12):
+            page.wait_for_timeout(500)
+            if not needs_login(page):
+                return
+    except Exception:
+        # A redirect or challenge must not tear down the saved browser session.
+        return
+
+
+def login_message(page, attempted):
+    if page in attempted:
+        return '已点击浏览器中填好的登录按钮；尚未取得课程访问权限。请查看登录窗口是否需要 MFA 或处理登录错误，完成后再次更新，无需重连。'
+    return '已保留登录窗口；未发现可直接提交的已填好 UW 登录表单。请完成登录或 MFA 后再次更新，无需重连。'
 
 
 def public_read(url):
@@ -88,7 +149,7 @@ class BrowserCollector:
     def read(self, url):
         if self.status()['status'] in {'disconnected', 'unavailable'}:
             self.set_state('connecting', '正在自动恢复已保存的课程浏览器会话。')
-        try: return self.submit("read", url).result(timeout=50)
+        try: return self.submit("read", url).result(timeout=70)
         except Exception: return {"url": url, "status": "unavailable", "message": "浏览器读取失败或超时，请检查登录状态。"}
 
     def disconnect(self):
@@ -98,16 +159,13 @@ class BrowserCollector:
     def run(self):
         context = manager = playwright = None
         login_pages = {}
+        attempted = set()
         def context_closed(*_):
             nonlocal context
             context = None
             login_pages.clear()
+            attempted.clear()
             self.set_state('disconnected', '课程浏览器已关闭；下次更新检索时自动恢复保存的会话。')
-        def needs_login(page):
-            host = urlparse(page.url).hostname or ''
-            return (any(word in page.url.lower() for word in ('/login', '/signin', '/saml', '/sso'))
-                    or host in {'login.microsoftonline.com', 'login.live.com', 'accounts.google.com'}
-                    or bool(page.locator('input[type="password"]').count()))
         while True:
             try:
                 action, url, future = self.commands.get(timeout=.1)
@@ -132,6 +190,7 @@ class BrowserCollector:
                     if manager: manager.stop()
                     context = manager = None
                     login_pages.clear()
+                    attempted.clear()
                     self.set_state("disconnected", "课程浏览器已关闭；下次更新检索时自动恢复保存的会话。")
                     future.set_result(self.status())
                     continue
@@ -155,25 +214,33 @@ class BrowserCollector:
                 host = urlparse(url).hostname
                 pending = login_pages.get(host)
                 if action == 'read' and pending and not pending.is_closed():
+                    submit_prefilled_login(pending, attempted)
                     if needs_login(pending):
-                        future.set_result({'url': url, 'status': 'login_required', 'message': '已打开此平台的登录窗口。请完成登录或 MFA 后再次更新；无需重新连接浏览器。'})
+                        future.set_result({'url': url, 'status': 'login_required', 'message': login_message(pending, attempted)})
                         continue
                     login_pages.pop(host, None)
                 page = context.new_page()
                 page.goto(url, wait_until="domcontentloaded", timeout=30000)
                 if action == "connect":
+                    page.wait_for_timeout(1200)
+                    submit_prefilled_login(page, attempted)
                     login_pages[host] = page
-                    self.set_state("connected", "课程浏览器已打开。请自行完成登录；是否有权读取将在检索时核实。")
+                    self.set_state("connected", login_message(page, attempted) if needs_login(page)
+                                   else "课程浏览器已打开并通过登录页面；课程访问权限将在检索时核实。")
                     future.set_result(self.status())
                     continue
                 page.wait_for_timeout(1200)
+                if needs_login(page):
+                    submit_prefilled_login(page, attempted)
+                    if not needs_login(page):
+                        page.goto(url, wait_until='domcontentloaded', timeout=10000)
                 extracted = page.locator("body").inner_text(timeout=10000)
                 text = extracted[:100000]
                 final = page.url
                 login = needs_login(page)
                 links = page.locator("a[href]").evaluate_all("nodes => nodes.map(n => ({url:n.href,title:n.innerText})).slice(0,500)")
                 result = {"url": url, "final_url": final, "status": "login_required" if login else "read" if len(text.strip()) >= 100 else "unavailable",
-                          "message": "已自动打开登录窗口；请完成首次登录或 MFA 后再次更新，无需重新连接浏览器。" if login else "已读取浏览器页面；浏览可能触发平台的阅读标记，不能据此推断整项完成。",
+                          "message": login_message(page, attempted) if login else "已读取浏览器页面；浏览可能触发平台的阅读标记，不能据此推断整项完成。",
                           "text": "" if login else text, "links": [] if login else links, "truncated": len(extracted) > 100000}
                 if result["truncated"]: result["message"] += "已达到内容上限，本次为部分读取。"
                 if login:

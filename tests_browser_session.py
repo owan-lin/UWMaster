@@ -5,7 +5,7 @@ import time
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
 from unittest.mock import patch
-from course_collector import BrowserCollector
+from course_collector import BrowserCollector, submit_prefilled_login, needs_login
 
 URL = 'https://example.edu/course'
 class Page:
@@ -78,3 +78,85 @@ with tempfile.TemporaryDirectory(dir='work', prefix='browser-session-test-') as 
         assert collector.read(URL)['status'] == 'read' and len(factory.launches) == 4
         collector.submit('disconnect').result(timeout=2)
 print('PASS automatic restore, same profile reuse, browser close and retained single login window')
+
+
+class AuthPage:
+    """Only booleans leave the fake form, matching the production contract."""
+    def __init__(self, filled=True, outcome='success', host='idp.u.washington.edu', otp=False):
+        self.url = 'https://' + host + '/idp/profile/SAML2/Redirect/SSO'
+        self.filled = filled; self.outcome = outcome; self.otp = otp; self.clicks = 0
+        self.button = SimpleNamespace(get_attribute=lambda name: 'Sign in', inner_text=lambda: 'Sign in',
+                                      is_visible=lambda: True, is_enabled=lambda: True, click=self.click)
+        self.form = SimpleNamespace(locator=self.form_locator)
+        self.password = SimpleNamespace(evaluate=lambda expression: self.filled,
+                                        locator=lambda selector: self.form)
+    def form_locator(self, selector):
+        if 'one-time-code' in selector:
+            return SimpleNamespace(count=lambda: int(self.otp))
+        if selector.startswith('button'):
+            return SimpleNamespace(count=lambda: 1, nth=lambda index: self.button)
+        return SimpleNamespace(evaluate_all=lambda expression: self.filled)
+    def locator(self, selector):
+        return SimpleNamespace(count=lambda: int('idp.u.washington.edu' in self.url or '/SSO' in self.url), first=self.password)
+    def click(self, **kwargs):
+        self.clicks += 1
+    def wait_for_timeout(self, milliseconds):
+        if self.clicks and self.outcome == 'success':
+            self.url = 'https://canvas.uw.edu/courses/1920200'
+        elif self.clicks and self.outcome == 'mfa':
+            self.url = 'https://api-example.duosecurity.com/frame/prompt'
+
+
+for outcome in ('success', 'failure', 'mfa'):
+    page = AuthPage(outcome=outcome); attempted = set()
+    submit_prefilled_login(page, attempted)
+    assert page.clicks == 1
+    assert needs_login(page) == (outcome != 'success')
+    submit_prefilled_login(page, attempted)
+    assert page.clicks == 1, 'Never resubmit credentials after failure or MFA'
+for options in ({'filled': False}, {'otp': True}, {'host': 'untrusted.example'}):
+    page = AuthPage(**options)
+    submit_prefilled_login(page, set())
+    assert page.clicks == 0
+page = AuthPage(filled=False); attempted = set()
+submit_prefilled_login(page, attempted)
+page.filled = True  # Password-manager autofill may arrive after the first read.
+submit_prefilled_login(page, attempted)
+assert page.clicks == 1 and not needs_login(page)
+print('PASS prefilled UW sign-in, redirect, MFA retention, failed-login deduplication and delayed autofill')
+
+
+class AutoPage(AuthPage, Page):
+    def __init__(self, context):
+        AuthPage.__init__(self)
+        self.context = context; self.closed = False; self.login = False
+    def goto(self, url, **kwargs):
+        self.url = 'https://idp.u.washington.edu/idp/profile/SAML2/Redirect/SSO' if self.context.login else url
+        self.login = self.context.login
+    def locator(self, selector):
+        if 'idp.u.washington.edu' in self.url:
+            return AuthPage.locator(self, selector)
+        return Page.locator(self, selector)
+    def wait_for_timeout(self, milliseconds):
+        AuthPage.wait_for_timeout(self, milliseconds)
+        if self.clicks:
+            self.context.login = self.login = False
+
+
+class AutoContext(Context):
+    def new_page(self):
+        page = AutoPage(self); self.pages.append(page); return page
+
+
+with tempfile.TemporaryDirectory(dir='work', prefix='browser-autologin-test-') as directory:
+    factory = Factory(); factory.login = True
+    module = ModuleType('playwright.sync_api'); module.sync_playwright = factory.manager
+    with patch.dict('sys.modules', {'playwright.sync_api': module}), patch(__name__ + '.Context', AutoContext):
+        collector = BrowserCollector(Path(directory) / 'profile')
+        result = collector.read('https://canvas.uw.edu/courses/1920200/assignments')
+        assert result['status'] == 'read', result
+        assert result['final_url'].endswith('/assignments')
+        page = factory.launches[0][2].pages[-1]
+        assert page.clicks == 1 and page.closed
+        collector.submit('disconnect').result(timeout=2)
+print('PASS same retrieval continues to original assignment page after automatic sign-in')
