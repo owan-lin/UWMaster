@@ -57,10 +57,11 @@ def public_read(url):
 
 
 class BrowserCollector:
-    def __init__(self):
+    def __init__(self, profile=None):
         self.commands = queue.Queue()
         self.lock = threading.Lock()
-        self.state = {"status": "disconnected", "message": "尚未连接课程浏览器。"}
+        self.profile = Path(profile) if profile else Path(__file__).resolve().parent / 'data/course-browser'
+        self.state = {"status": "disconnected", "message": "更新检索时自动恢复本机课程浏览器会话；首次登录可使用“连接课程浏览器”。"}
         self.worker = None
 
     def status(self):
@@ -85,17 +86,28 @@ class BrowserCollector:
         return self.status()
 
     def read(self, url):
-        if self.status()["status"] != "connected":
-            return {"url": url, "status": "login_required", "message": "请先连接课程浏览器并自行登录。"}
+        if self.status()['status'] in {'disconnected', 'unavailable'}:
+            self.set_state('connecting', '正在自动恢复已保存的课程浏览器会话。')
         try: return self.submit("read", url).result(timeout=50)
         except Exception: return {"url": url, "status": "unavailable", "message": "浏览器读取失败或超时，请检查登录状态。"}
 
     def disconnect(self):
         self.submit("disconnect")
-        return {"status": "disconnecting", "message": "正在关闭课程浏览器；会话保留在本机。"}
+        return {"status": "disconnecting", "message": "正在关闭课程浏览器；会话保留，下次更新检索时自动恢复。"}
 
     def run(self):
         context = manager = playwright = None
+        login_pages = {}
+        def context_closed(*_):
+            nonlocal context
+            context = None
+            login_pages.clear()
+            self.set_state('disconnected', '课程浏览器已关闭；下次更新检索时自动恢复保存的会话。')
+        def needs_login(page):
+            host = urlparse(page.url).hostname or ''
+            return (any(word in page.url.lower() for word in ('/login', '/signin', '/saml', '/sso'))
+                    or host in {'login.microsoftonline.com', 'login.live.com', 'accounts.google.com'}
+                    or bool(page.locator('input[type="password"]').count()))
         while True:
             try:
                 action, url, future = self.commands.get(timeout=.1)
@@ -111,23 +123,28 @@ class BrowserCollector:
                             try: manager.stop()
                             except Exception: pass
                         manager = None
-                        self.set_state("disconnected", "课程浏览器已关闭，请重新连接。")
+                        login_pages.clear()
+                        self.set_state("disconnected", "课程浏览器已关闭；下次更新检索时自动恢复保存的会话。")
                 continue
             try:
                 if action == "disconnect":
                     if context: context.close()
                     if manager: manager.stop()
                     context = manager = None
-                    self.set_state("disconnected", "课程浏览器已关闭。")
+                    login_pages.clear()
+                    self.set_state("disconnected", "课程浏览器已关闭；下次更新检索时自动恢复保存的会话。")
                     future.set_result(self.status())
                     continue
                 if not context:
+                    if manager:
+                        try: manager.stop()
+                        except Exception: pass
                     from playwright.sync_api import sync_playwright
                     manager = sync_playwright().start()
-                    profile = Path(__file__).resolve().parent / "data/course-browser"
-                    profile.mkdir(parents=True, exist_ok=True)
-                    context = manager.chromium.launch_persistent_context(str(profile), channel="msedge", headless=False,
+                    self.profile.mkdir(parents=True, exist_ok=True)
+                    context = manager.chromium.launch_persistent_context(str(self.profile), channel="msedge", headless=False,
                                                                         accept_downloads=False)
+                    context.on('close', context_closed)
                     def filter_request(route):
                         try:
                             if route.request.url.startswith(("data:", "blob:")): return route.continue_()
@@ -135,9 +152,17 @@ class BrowserCollector:
                             route.continue_()
                         except Exception: route.abort()
                     context.route("**/*", filter_request)
+                host = urlparse(url).hostname
+                pending = login_pages.get(host)
+                if action == 'read' and pending and not pending.is_closed():
+                    if needs_login(pending):
+                        future.set_result({'url': url, 'status': 'login_required', 'message': '已打开此平台的登录窗口。请完成登录或 MFA 后再次更新；无需重新连接浏览器。'})
+                        continue
+                    login_pages.pop(host, None)
                 page = context.new_page()
                 page.goto(url, wait_until="domcontentloaded", timeout=30000)
                 if action == "connect":
+                    login_pages[host] = page
                     self.set_state("connected", "课程浏览器已打开。请自行完成登录；是否有权读取将在检索时核实。")
                     future.set_result(self.status())
                     continue
@@ -145,17 +170,22 @@ class BrowserCollector:
                 extracted = page.locator("body").inner_text(timeout=10000)
                 text = extracted[:100000]
                 final = page.url
-                login = any(word in final.lower() for word in ("/login", "/signin", "/saml", "/sso")) or page.locator('input[type="password"]').count()
+                login = needs_login(page)
                 links = page.locator("a[href]").evaluate_all("nodes => nodes.map(n => ({url:n.href,title:n.innerText})).slice(0,500)")
                 result = {"url": url, "final_url": final, "status": "login_required" if login else "read" if len(text.strip()) >= 100 else "unavailable",
-                          "message": "登录尚未完成或已过期。" if login else "已读取浏览器页面；浏览可能触发平台的阅读标记，不能据此推断整项完成。",
+                          "message": "已自动打开登录窗口；请完成首次登录或 MFA 后再次更新，无需重新连接浏览器。" if login else "已读取浏览器页面；浏览可能触发平台的阅读标记，不能据此推断整项完成。",
                           "text": "" if login else text, "links": [] if login else links, "truncated": len(extracted) > 100000}
                 if result["truncated"]: result["message"] += "已达到内容上限，本次为部分读取。"
-                page.close()
-                self.set_state("connected", "课程浏览器可用；各平台登录状态在读取时核实。")
+                if login:
+                    login_pages[host] = page
+                    self.set_state('connected', '会话已自动恢复；有平台需要在已打开的窗口中完成登录或 MFA。')
+                else:
+                    page.close()
+                    self.set_state("connected", "课程浏览器会话已恢复并可用；各平台登录状态在读取时核实。")
                 future.set_result(result)
             except Exception:
                 context = None
+                login_pages.clear()
                 if manager:
                     try: manager.stop()
                     except Exception: pass
