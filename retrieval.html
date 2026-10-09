@@ -7,6 +7,7 @@
 <nav class="utility-bar" aria-label="页面导航"><div class="utility-inner"><a class="app-brand" href="/">UW<span>Master</span></a><div class="page-tabs"><a href="/">我的学期</a><a href="/retrieval.html" aria-current="page">课程检索</a></div></div></nav>
 <main id="retrieval">
 <header class="retrieval-heading"><p class="section-caption">COURSE RETRIEVAL</p><h1>每门课，自己的检索要求。</h1><p>先调整课程要求，再检索来源。有效更新自动写入待办，冲突在检索助手中处理。</p></header>
+<p><a href="/gmail.html">邮件检索 · 连接 Gmail 与设置范围</a></p>
 <p id="pageStatus" role="status" aria-live="polite">正在读取课程要求…</p>
 <div class="retrieval-layout"><aside><h2>我的课程</h2><div id="courseNav"></div><a class="return-link" href="/">查看待办与日历 ↗</a></aside>
 <section class="retrieval-editor" aria-labelledby="courseTitle"><h2 id="courseTitle">课程要求</h2><form id="rulesForm"><label for="requirements">这门课要检索哪些任务？</label><textarea id="requirements" rows="8" maxlength="12000" required></textarea><label for="sources">检索来源（每行一个网页链接）</label><textarea id="sources" rows="6" spellcheck="false"></textarea><p class="field-hint">保留课程官网、Canvas、Ed 和 Gradescope 等来源；登录后的页面使用你连接的专用课程浏览器读取。</p><div class="editor-actions"><button id="saveRules" class="gold" type="submit">保存课程要求</button><button id="exportRequest" type="button">下载检索要求</button></div></form>
